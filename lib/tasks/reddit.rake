@@ -1,4 +1,5 @@
 namespace :reddit do
+  
   desc "Gets new entries from subreddits of interest"
   task get_new: :environment do
     subreddits = ['politics']
@@ -10,6 +11,6 @@ namespace :reddit do
 
   desc "Update censored articles and delete old articles that have survived"
   task update_censored: :environment do
-    RedditPost.delete_old
+    RedditPost.delete_old_batch
   end
 end

@@ -1,0 +1,43 @@
+<div class="container">
+<div class="row">
+
+<h1>Reddit Censorship</h1>
+<p>A small project to examine posts that are deleted from certain active subreddits.
+Monitored posts are those currently being watched, while censored posts are those that have been removed by a subreddit, although we do not look at the mechanism for such removals, whether automatic or manual by a moderator.</p>
+<p>Posts are scraped every hour from /new, while once posts are three days old, we check if they have been deleted from the subreddit, and if they have we add them to the censored category.
+Deletion is checked by a search request, and posts removed from a subreddit can still be reached by their original URL, but no longer show up in searches.</p>
+
+<h2>Censored</h2>
+<table class="table table-striped">
+<tr>
+<th>Subreddit</th>
+<th>Title</th>
+<th>URL</th>
+</tr>
+<% @censored_posts.each do |post| %>
+<tr>
+<td><%= post.subreddit %></td>
+<td><%= link_to post.title, "https://www.reddit.com/r/#{post.subreddit}/comments/#{post.reddit_id}" %></td>
+<td><%= link_to post.url, post.url %></td>
+</tr>
+<% end %>
+</table>
+
+<h2>Currently Monitoring</h2>
+<table class="table table-striped">
+<tr>
+<th>Subreddit</th>
+<th>Title</th>
+<th>URL</th>
+</tr>
+<% @watching_posts.each do |post| %>
+<tr>
+<td><%= post.subreddit %></td>
+<td><%= link_to post.title, "https://www.reddit.com/r/#{post.subreddit}/comments/#{post.reddit_id}" %></td>
+<td><%= link_to post.url, post.url %></td>
+</tr>
+<% end %>
+</table>
+
+</div>
+</div>
