@@ -18,3 +18,4 @@
 # Ignore ruby-version
 /.ruby-version
 .rake_tasks~
+test.rb
