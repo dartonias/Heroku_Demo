@@ -50,7 +50,7 @@ class RedditPost < ActiveRecord::Base
   # This method uses batch query to reduce number of requests to reddit
   # useage
   # RedditPost.delete_old_batch
-  def self.delete_old_batch(old_limit=5.minutes)
+  def self.delete_old_batch(old_limit=3.days)
     # Get the seconds since the epoch to compare with created_utc
     oldest = (DateTime.now - old_limit).to_i
     # Array of distinct subreddits
