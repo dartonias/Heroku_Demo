@@ -48,6 +48,7 @@ class RedditQuery
     end
     query = query[0..-5]
     query << ")"
+    puts "query: #{query}"
     response = self.get("/r/search.json", { query: { q: query , limit: "25"} })
     if response.code == 200
       return self.parse(response.body)
