@@ -54,23 +54,24 @@ class RedditPost < ActiveRecord::Base
     # Get the seconds since the epoch to compare with created_utc
     old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
     batch_size = (ENV['REDDIT_BATCH_SIZE'] || 20).to_i
-    puts "Batch size: #{batch_size}"
+    debug = ENV['DEBUG_DELETE_OLD_BATCH']
+    puts "Batch size: #{batch_size}" if debug
     oldest = (DateTime.now - old_limit).to_i
     # Array of distinct subreddits
     srs = RedditPost.distinct.pluck(:subreddit)
     srs.each do |sr|
       offset = 0
       num = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).where("created_utc < ?", oldest).offset(offset).limit(batch_size).count
-      puts "num: #{num}"
+      puts "num: #{num}" if debug
       while num > 0 do
         ids = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).where("created_utc < ?", oldest).offset(offset).limit(batch_size).pluck(:reddit_id)
-        puts "sr: #{sr}, ids: #{ids}"
+        puts "sr: #{sr}, ids: #{ids}" if debug
         # Process here
         search_result = RedditQuery.search_many(sr,ids)
         if !search_result.nil?
           search_result.each do |res|
             data = post_params(res)
-            puts "data: #{data}"
+            puts "data: #{data}" if debug
             # We'll double check that it was in our initial list
             if ids.delete(data["reddit_id"])
               # Old an uncensored, we no longer care about you
