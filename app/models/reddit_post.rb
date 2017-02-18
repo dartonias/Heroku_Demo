@@ -67,7 +67,6 @@ class RedditPost < ActiveRecord::Base
         puts "sr: #{sr}, ids: #{ids}"
         # Process here
         search_result = RedditQuery.search_many(sr,ids)
-        puts "Search results: #{search_result}"
         if !search_result.nil?
           search_result.each do |res|
             data = post_params(res)
@@ -82,6 +81,9 @@ class RedditPost < ActiveRecord::Base
             post.censored = true
             post.save
           end
+        else
+          # If reddit gives us a bad URL code and hence nil for the search, we stop searching
+          break
         end
         # End while logic
         offset += batch_size
