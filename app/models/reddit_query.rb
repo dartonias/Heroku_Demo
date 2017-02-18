@@ -39,15 +39,16 @@ class RedditQuery
   # data = RedditQuery.search_many('MonsterHunter',['5udxoh','5udxoh','5udxoh'])
   def self.search_many(subreddit, full_id_list)
     if full_id_list.count > 25
-      # Only 25 results allowed at a time
+      # Only 25 results max allowed at a time
       return nil
     end
-    query = ""
+    query = "subreddit:#{subreddit} AND ("
     full_id_list.each do |fid|
       query << "fullname:#{fid} OR "
     end
     query = query[0..-5]
-    response = self.get("/r/#{subreddit}/search.json", { query: { q: query , limit: "25", t: "posts"} })
+    query << ")"
+    response = self.get("/r/search.json", { query: { q: query , limit: "25"} })
     if response.code == 200
       return self.parse(response.body)
     else

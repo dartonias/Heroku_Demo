@@ -53,19 +53,23 @@ class RedditPost < ActiveRecord::Base
   def self.delete_old_batch
     # Get the seconds since the epoch to compare with created_utc
     old_limit = ENV['OLD_TIME_HOURS'].to_i.hours || 24.hours
+    batch_size = ENV['REDDIT_BATCH_SIZE'].to_i || 20
     oldest = (DateTime.now - old_limit).to_i
     # Array of distinct subreddits
     srs = RedditPost.distinct.pluck(:subreddit)
     srs.each do |sr|
       offset = 0
-      num = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).where("created_utc < ?", oldest).offset(offset).limit(25).count
+      num = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).where("created_utc < ?", oldest).offset(offset).limit(batch_size).count
+      puts "num: #{num}"
       while num > 0 do
-        ids = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).where("created_utc < ?", oldest).offset(offset).limit(25).pluck(:reddit_id)
+        ids = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).where("created_utc < ?", oldest).offset(offset).limit(batch_size).pluck(:reddit_id)
+        puts "sr: #{sr}, ids: #{ids}"
         # Process here
         search_result = RedditQuery.search_many(sr,ids)
         if !search_result.nil?
           search_result.each do |res|
             data = post_params(res)
+            puts "data: #{data}"
             ids.delete(data["reddit_id"])
             # Old an uncensored, we no longer care about you
             RedditPost.where(censored: false, subreddit: sr, reddit_id: data["reddit_id"]).first.delete
@@ -78,8 +82,8 @@ class RedditPost < ActiveRecord::Base
           end
         end
         # End while logic
-        offset += 25
-        num = RedditPost.order(:created_utc).where(censored: false).where("created_utc < ?", oldest).offset(offset).limit(25).count
+        offset += batch_size
+        num = RedditPost.order(:created_utc).where(censored: false).where("created_utc < ?", oldest).offset(offset).limit(batch_size).count
       end
     end
   end
