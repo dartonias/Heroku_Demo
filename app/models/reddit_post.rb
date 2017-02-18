@@ -52,8 +52,9 @@ class RedditPost < ActiveRecord::Base
   # RedditPost.delete_old_batch
   def self.delete_old_batch
     # Get the seconds since the epoch to compare with created_utc
-    old_limit = ENV['OLD_TIME_HOURS'].to_i.hours || 24.hours
-    batch_size = ENV['REDDIT_BATCH_SIZE'].to_i || 20
+    old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
+    batch_size = (ENV['REDDIT_BATCH_SIZE'] || 20).to_i
+    puts "Batch size: #{batch_size}"
     oldest = (DateTime.now - old_limit).to_i
     # Array of distinct subreddits
     srs = RedditPost.distinct.pluck(:subreddit)
