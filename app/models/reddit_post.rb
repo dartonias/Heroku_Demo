@@ -71,9 +71,11 @@ class RedditPost < ActiveRecord::Base
           search_result.each do |res|
             data = post_params(res)
             puts "data: #{data}"
-            ids.delete(data["reddit_id"])
-            # Old an uncensored, we no longer care about you
-            RedditPost.where(censored: false, subreddit: sr, reddit_id: data["reddit_id"]).first.delete
+            # We'll double check that it was in our initial list
+            if ids.delete(data["reddit_id"])
+              # Old an uncensored, we no longer care about you
+              RedditPost.where(censored: false, subreddit: sr, reddit_id: data["reddit_id"]).first.delete
+            end
           end
           # Ones that were not found must have been censored
           ids.each do |cen_id|
