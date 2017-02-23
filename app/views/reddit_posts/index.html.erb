@@ -4,9 +4,15 @@
 
 <h1>Reddit Censorship</h1>
 <p>A small project to examine posts that are deleted from certain active subreddits.
-Monitored posts are those currently being watched, while censored posts are those that have been removed by a subreddit, although we do not look at the mechanism for such removals, whether automatic or manually by a moderator.</p>
-<p>Posts are scraped every hour from <code>reddit.com/r/&lt;subreddit&gt;/new</code>, while once posts are one day old, we check if they have been deleted from the subreddit, and if they have we add them to the censored category.
+Monitored posts are those currently being watched, while censored posts are those that have been removed by a subreddit.
+Note, we do not look at the mechanism for such removals, whether automatic or manually by a moderator.</p>
+<p>Posts are scraped every hour from <code>reddit.com/r/&lt;subreddit&gt;/new</code>.
+Once posts are one day old, we check if they have been deleted from the subreddit; if they have we add them to the censored category.
 Deletion is checked by a search request, as posts removed from a subreddit can still be reached by their original URL, but no longer show up in searches.</p>
+
+<p>
+The subreddits chosen are simply those that I suspect remove enough posts to gather interesting data on the problem.
+</p>
 
 <p>Valid modifiers are 
 <table class="args">

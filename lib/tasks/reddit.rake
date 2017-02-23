@@ -2,7 +2,8 @@ namespace :reddit do
   
   desc "Gets new entries from subreddits of interest"
   task get_new: :environment do
-    subreddits = ['politics']
+    subreddits = ENV['REDDIT_WATCH_SUBREDDITS'] || 'politics'
+    subreddits = subreddits.split
     subreddits.each do |sr|
       data = RedditQuery.new_posts(sr)
       RedditPost.add_to_watchlist(data)
