@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   # You can have the root of your site routed with "root"
   root 'welcome#index'
   get 'reddit' => 'reddit_posts#index'
+  get 'sudoku' => 'sudoku_puzzles#index'
+  post 'sudoku' => 'sudoku_puzzles#create'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

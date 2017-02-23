@@ -7,27 +7,37 @@ class SudokuSolver
   # constraints = (0..80).map {|a| 0}
   # test = SudokuSolver.new
   # test.perform(constraints)
+  # # To run asynchronously
+  # constraints = (0..80).map {|a| 0}
+  # SudokuSolver.perform_async(constraints)
   ###
-  def perform(constraints)
+  def perform(obj)
     # Puzzle is 9x9, so we expect an array of 81 integers
     # For the format, we assume that the numbers are listed for each row
     # of 9 numbers, and then by column
     # Constraints pass, set internally and write initial job to database
-    @constraints = check_constraints(constraints)
-    db_initial
+    case obj
+    when Array
+      constraints = obj
+      @constraints = check_constraints(constraints)
+      db_initial
+    when SudokuPuzzle
+      @db_entry = obj
+      @constraints = @db_entry.constraints_array
+    end
     # Initialize the simulation, and calculate initial energy
-    if init_sim
-      # Do sweeps (check energy after each step)
-      1000.times do
-        break if do_sweep
+    if !@db_entry.solved? && !@db_entry.impossible?
+      if init_sim
+        # Do sweeps (check energy after each step)
+        1000.times do
+          break if do_sweep
+        end
+        # Save solution to database
+        db_save_current
+      else
+        # Simulation was impossible from the start
+        db_save_impossible
       end
-      # If energy zero, save solution to database
-      if @total_energy == 0
-      end
-      puts "Puzzle:\n\n#{pretty}\nEnergy: #{@total_energy}"
-    else
-      # Simulation was impossible from the start
-      # Write failure case to database
     end
   end
 
@@ -36,7 +46,7 @@ class SudokuSolver
     (0..8).each do |row|
       (0..8).each do |col|
         ind = row*9 + col
-        r << "#{@config[ind]} "
+        r << "#{@lowest_config[ind]} "
         if (col%3)==2
           r << ' '
         end
@@ -72,6 +82,20 @@ class SudokuSolver
 
   def db_initial
     # Add initial problem to DB, mark as being worked on
+    @db_entry = SudokuPuzzle.new_puzzle(@constraints)
+  end
+
+  def db_save_current
+    # Save current progress or solution
+    if @lowest_energy == 0
+      @db_entry.save_finished(@lowest_config)
+    else
+      @db_entry.save_current(@lowest_config, @lowest_energy)
+    end
+  end
+
+  def db_save_impossible
+    @db_entry.save_impossible
   end
 
   # Helper class for indexing into @config
@@ -113,7 +137,7 @@ class SudokuSolver
       # Puzzle had repeats in a subsquare, also unsolvable
       return false
     end
-    @beta = ENV['SUDOKU_BETA'].to_f || 5.0
+    @beta = (ENV['SUDOKU_BETA'] || 5.0).to_f
     return true
   end
 
@@ -172,6 +196,7 @@ class SudokuSolver
     if (energy_final - energy_initial) < 0 || rand < Math.exp(-1*@beta*(energy_final - energy_initial))
       # Accept the move
       @total_energy += (energy_final - energy_initial)
+      check_lowest
       # Checks for zero energy
       if @total_energy == 0
         return true
@@ -181,6 +206,13 @@ class SudokuSolver
       @sconfig[square, s1], @sconfig[square, s2] = @sconfig[square, s2], @sconfig[square, s1]
     end
     return false
+  end
+
+  def check_lowest
+    if @total_energy < @lowest_energy
+      @lowest_energy = @total_energy
+      @lowest_config = @config.map {|a| a}
+    end
   end
 
   def fill_config
@@ -196,18 +228,27 @@ class SudokuSolver
         end
       end
       # Go through a second time, and write over the zeros
-      (0..8).each do |elem|
-        if @sconfig[square,elem]==0
-          val = needed.pop
-          # This should not be nil
-          if val.nil?
-            raise "This shouldnt not have happened (fill_config)"
+      if @db_entry.solution.nil?
+        (0..8).each do |elem|
+          if @sconfig[square,elem]==0
+            val = needed.pop
+            # This should not be nil
+            if val.nil?
+              raise "This shouldnt not have happened (fill_config)"
+            end
+            @sconfig[square,elem] = val
           end
-          @sconfig[square,elem] = val
         end
       end
     end
+    if !@db_entry.solution.nil?
+      temp = @db_entry.solution_array
+      (0..80).each do |ind|
+        @config[ind] = temp[ind]
+      end
+    end
     calc_total_energy
+    @lowest_energy = @total_energy
     return true
   end
 
@@ -268,6 +309,7 @@ class SudokuSolver
     (0..8).each do |col|
       @total_energy += col_energy(col)
     end
+    @lowest_energy = @total_energy
     return @total_energy
   end
 end

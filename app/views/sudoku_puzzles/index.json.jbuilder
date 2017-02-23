@@ -1,0 +1,1 @@
+json.partial! partial: 'sudoku_puzzles/puzzle', collection: @recent_puzzles, as: :puzzle

@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  constraints: MyString
+  solution: MyString
+  status: MyString
+
+two:
+  constraints: MyString
+  solution: MyString
+  status: MyString

@@ -1,0 +1,39 @@
+<%# Formatting modified from http://stackoverflow.com/a/23497716 %>
+<div class="row">
+<div class="col-sm-6">
+<table>
+  <caption>Constraints</caption>
+  <colgroup><col><col><col>
+  <colgroup><col><col><col>
+  <colgroup><col><col><col>
+  <% (0..2).each do |row_group|%>
+    <tbody>
+    <% (0..2).each do |row| %>
+      <tr>
+      <% (0..8).each do |col| %>
+        <td> <%= puzzle.constraints[row_group*9*3 + row*9 + col] if puzzle.constraints[row_group*9*3 + row*9 + col].to_i>0 %>
+      <% end %>
+    <% end %>
+  <% end %>
+</table>
+</div>
+
+<div class="col-sm-6">
+<table>
+  <caption><%= puzzle.status %></caption>
+  <colgroup><col><col><col>
+  <colgroup><col><col><col>
+  <colgroup><col><col><col>
+  <% (0..2).each do |row_group|%>
+    <tbody>
+    <% (0..2).each do |row| %>
+      <tr>
+      <% (0..8).each do |col| %>
+        <td class="<%= 'error' if puzzle.is_error?(row_group*3 + row, col) %>"> <%= puzzle.solution[row_group*9*3 + row*9 + col] if puzzle.solution %>
+      <% end %>
+    <% end %>
+  <% end %>
+</table>
+</div>
+</div>
+<hr>

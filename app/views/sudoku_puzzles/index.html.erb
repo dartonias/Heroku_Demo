@@ -1,0 +1,55 @@
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+
+<h1>Sudoku Solving</h1>
+
+<p>
+This project allows the user to submit a Sudoku puzzle to the server for solving.
+The initial puzzle is written to the database and worked on by a forked process, which then writes its result back to the database after finding a solution or running for a fixed amount of time.
+Rows or columns that do not satisfy Sudoku rules are shown in red.
+</p>
+
+<p>
+If a problem is requested from the database and it already exists, it is brought to the top of the recent results and worked on if there is not yet a solution for the problem.
+</p>
+
+<p>Sudoku puzzle formatting from <%= link_to "stackoverflow", 'http://stackoverflow.com/a/23497716' %>.</p>
+
+<p><%= link_to "JSON sudoku results", sudoku_path(format: :json) %></p>
+
+<h2>Enter a puzzle</h2>
+
+<p>
+Zero (<code>0</code>) corresponds to no constraint in the initial Sudoku puzzle.
+The numbers below are editable text fields, where you should enter the numbers corresponding to the initial Sudoku problem.
+Selecting an element, mouse scroll will let you change the value, or you can type a new value into the box.
+</p>
+
+<%= form_tag(controller: "sudoku_puzzles", action: "create", method: "post") do %>
+  <table class="sudoku-form">
+    <caption>New puzzle constraints</caption>
+    <colgroup><col><col><col>
+    <colgroup><col><col><col>
+    <colgroup><col><col><col>
+    <% (0..2).each do |row_group|%>
+      <tbody>
+      <% (0..2).each do |row| %>
+        <tr>
+        <% (0..8).each do |col| %>
+          <td> <%= number_field(:constraints, col + row*9 + row_group*9*3, in: 0..9, step: 1, value: 0, maxlength: 1) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </table>
+  <%= submit_tag("Solve") %>
+<% end %>
+
+
+
+<h2>Recent Puzzles</h2>
+<%= render partial: "puzzle", collection: @recent_puzzles %>
+
+</div>
+</div>
+</div>
