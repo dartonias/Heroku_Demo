@@ -27,9 +27,10 @@ class SudokuSolver
     end
     # Initialize the simulation, and calculate initial energy
     if !@db_entry.solved? && !@db_entry.impossible?
+      @num_sweeps = (ENV['SUDOKU_NUM_SWEEPS'] || 10000).to_i
       if init_sim
         # Do sweeps (check energy after each step)
-        1000.times do
+        @num_sweeps.times do
           break if do_sweep
         end
         # Save solution to database
@@ -137,12 +138,14 @@ class SudokuSolver
       # Puzzle had repeats in a subsquare, also unsolvable
       return false
     end
-    @beta = (ENV['SUDOKU_BETA'] || 5.0).to_f
+    @beta = (ENV['SUDOKU_BETA_INITIAL'] || 1.0).to_f
+    @delta_beta = ((ENV['SUDOKU_BETA_FINAL'] || 10.0).to_f - @beta)/@num_sweeps
     return true
   end
 
   # An update roughly proportional to the size of the system
   def do_sweep
+    @beta += @delta_beta
     81.times do
       square = @flippable_squares.sample
       swaps = @flippable[square].sample(2)
@@ -231,11 +234,12 @@ class SudokuSolver
       if @db_entry.solution.nil?
         (0..8).each do |elem|
           if @sconfig[square,elem]==0
-            val = needed.pop
+            val = needed.sample
             # This should not be nil
             if val.nil?
               raise "This shouldnt not have happened (fill_config)"
             end
+            needed.delete(val)
             @sconfig[square,elem] = val
           end
         end
@@ -249,6 +253,7 @@ class SudokuSolver
     end
     calc_total_energy
     @lowest_energy = @total_energy
+    @lowest_config = @config.map {|a| a}
     return true
   end
 

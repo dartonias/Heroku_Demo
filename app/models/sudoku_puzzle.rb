@@ -6,7 +6,12 @@ class SudokuPuzzle < ActiveRecord::Base
     constraint_string = constraints.join("")
     sample = SudokuPuzzle.where(constraints: constraint_string).first
     if sample
-      sample.touch
+      sample.status = "Submitted"
+      # Go with deleting the old solution to get new seeding
+      # If we leave the solution, it will be used as a seed configuration
+      # for the next simulation
+      sample.solution = nil
+      sample.save
       return sample
     else
       problem = SudokuPuzzle.new
@@ -81,5 +86,9 @@ class SudokuPuzzle < ActiveRecord::Base
 
   def impossible?
     self.status == "Impossible"
+  end
+
+  def can_work_on?
+    !(self.status == "Submitted") && !impossible? && !solved?
   end
 end

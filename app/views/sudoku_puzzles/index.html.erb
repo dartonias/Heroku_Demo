@@ -7,6 +7,7 @@
 <p>
 This project allows the user to submit a Sudoku puzzle to the server for solving.
 The initial puzzle is written to the database and worked on by a forked process, which then writes its result back to the database after finding a solution or running for a fixed amount of time.
+This forked process runs on the same CPU serving the web pages, so it slows down web processing a bit, but allows me to run on heroku without needing a dedicated CPU polling the job queue.
 Rows or columns that do not satisfy Sudoku rules are shown in red.
 </p>
 
@@ -16,7 +17,13 @@ If a problem is requested from the database and it already exists, it is brought
 
 <p>Sudoku puzzle formatting from <%= link_to "stackoverflow", 'http://stackoverflow.com/a/23497716' %>.</p>
 
-<p><%= link_to "JSON sudoku results", sudoku_path(format: :json) %></p>
+<p>Valid modifiers are 
+<table class="args">
+<tr><td><code>limit</code></td><td>(int) limits the number of entries returned</td></tr>
+</table>
+</p>
+
+<p><%= link_to "JSON results", sudoku_path(format: :json, limit: params[:limit]) %></p>
 
 <h2>Enter a puzzle</h2>
 
@@ -27,7 +34,7 @@ Selecting an element, mouse scroll will let you change the value, or you can typ
 </p>
 
 <%= form_tag(controller: "sudoku_puzzles", action: "create", method: "post") do %>
-  <table class="sudoku-form">
+  <table class="sudoku">
     <caption>New puzzle constraints</caption>
     <colgroup><col><col><col>
     <colgroup><col><col><col>
@@ -44,8 +51,6 @@ Selecting an element, mouse scroll will let you change the value, or you can typ
   </table>
   <%= submit_tag("Solve") %>
 <% end %>
-
-
 
 <h2>Recent Puzzles</h2>
 <%= render partial: "puzzle", collection: @recent_puzzles %>

@@ -1,7 +1,7 @@
 <%# Formatting modified from http://stackoverflow.com/a/23497716 %>
 <div class="row">
 <div class="col-sm-6">
-<table>
+<table class="sudoku">
   <caption>Constraints</caption>
   <colgroup><col><col><col>
   <colgroup><col><col><col>
@@ -19,7 +19,7 @@
 </div>
 
 <div class="col-sm-6">
-<table>
+<table class="sudoku">
   <caption><%= puzzle.status %></caption>
   <colgroup><col><col><col>
   <colgroup><col><col><col>
@@ -34,6 +34,14 @@
     <% end %>
   <% end %>
 </table>
+
+<% if puzzle.can_work_on? %>
+  <%= form_tag(controller: "sudoku_puzzles", action: "create", method: "post") do %>
+  <%= hidden_field_tag(:constraints_str, puzzle.constraints) %>
+  <%= submit_tag("Work on") %>
+  <% end %>
+<% end %>
+
 </div>
 </div>
 <hr>

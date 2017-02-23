@@ -16,6 +16,22 @@ class RedditPost < ActiveRecord::Base
     end
   end
 
+  def self.search(query)
+    if query and query.size > 0
+      where("title LIKE ? OR title LIKE ? OR title LIKE ?", "%#{query}%", "%#{query.downcase}%", "%#{query.capitalize}%")
+    else
+      all
+    end
+  end
+
+  def self.regexp(query)
+    if query and query.size > 0
+      where("title ~* ?", query)
+    else
+      all
+    end
+  end
+
   # Finds all posts that have survived at least old_limit time since creation
   # and marks them as censored or deletes them from the database.
   # Failed queries to reddit do not modify the database entries

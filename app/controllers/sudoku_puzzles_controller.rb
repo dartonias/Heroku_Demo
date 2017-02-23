@@ -2,7 +2,8 @@ class SudokuPuzzlesController < ApplicationController
 
   def index
     # Default ordering sorts by most recent
-    @recent_puzzles = SudokuPuzzle.all.limit(25)
+    limit = (params["limit"] || 25).to_i
+    @recent_puzzles = SudokuPuzzle.all.limit(limit)
 
     respond_to do |format|
       format.html
@@ -12,8 +13,10 @@ class SudokuPuzzlesController < ApplicationController
 
   def create
     set_constraints
-    puzzle = SudokuPuzzle.new_puzzle(@constraints)
-    SudokuSolver.perform_async(puzzle)
+    if @constraints
+      puzzle = SudokuPuzzle.new_puzzle(@constraints)
+      SudokuSolver.perform_async(puzzle)
+    end
     redirect_to sudoku_path
   end
 
@@ -23,13 +26,17 @@ class SudokuPuzzlesController < ApplicationController
       (0..80).each do |i|
         if params["constraints"][i.to_s]
           temp = params["constraints"][i.to_s].to_i
-          if temp >= 0 && temp <= 9
+          if temp >= 1 && temp <= 9
             @constraints << temp
+          else
+            @constraints << 0
           end
         else
           @constraints = nil
         end
       end
+    elsif params["constraints_str"]
+      @constraints = params["constraints_str"].split("").map {|i| i.to_i}
     else
       @constraints = nil
     end

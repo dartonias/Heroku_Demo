@@ -23,16 +23,19 @@ input[type="number"] {
 td.error {
   background-color: #ff9891;
 }
+table.args td:nth-child(2) {
+  padding-left: 20px;
+}
 
 // Formatting modified from http://stackoverflow.com/a/23497716
-table { 
+table.sudoku { 
   border-collapse: collapse; 
   font-family: Calibri, sans-serif; 
 }
-colgroup, tbody { 
+table.sudoku colgroup, table.sudoku tbody { 
   border: solid medium; 
 }
-td { 
+table.sudoku td { 
   border: solid thin; 
   height: 1.8em; 
   width: 1.8em; 

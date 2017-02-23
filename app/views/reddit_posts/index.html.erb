@@ -8,6 +8,25 @@ Monitored posts are those currently being watched, while censored posts are thos
 <p>Posts are scraped every hour from <code>reddit.com/r/&lt;subreddit&gt;/new</code>, while once posts are one day old, we check if they have been deleted from the subreddit, and if they have we add them to the censored category.
 Deletion is checked by a search request, as posts removed from a subreddit can still be reached by their original URL, but no longer show up in searches.</p>
 
+<p>Valid modifiers are 
+<table class="args">
+<tr><td><code>search</code></td><td>(str) limits results that contain a substring in the title</td></tr>
+<tr><td><code>regexp</code></td><td>(str) limits results that contain the regular expression in the title</td></tr>
+<tr><td><code>limit</code></td><td>(int) limits the number of entries returned</td></tr>
+</table>
+</p>
+
+<%= form_tag reddit_path, :method => 'get' do %>
+    <%= text_field_tag :search, params[:search] %>
+    <%= submit_tag "Search", :name => nil %>
+<% end %>
+<%= form_tag reddit_path, :method => 'get' do %>
+    <%= text_field_tag :regexp, params[:regexp] %>
+    <%= submit_tag "Regexp", :name => nil %>
+<% end %>
+
+<p><%= link_to "JSON results", reddit_path(format: :json, search: params[:search], regexp: params[:regexp], limit: params[:limit]) %></p>
+
 <h2>Censored</h2>
 <table class="table table-striped">
 <tr>
@@ -15,13 +34,7 @@ Deletion is checked by a search request, as posts removed from a subreddit can s
 <th>Title</th>
 <th>URL</th>
 </tr>
-<% @censored_posts.each do |post| %>
-<tr>
-<td><%= post.subreddit %></td>
-<td><%= link_to post.title, "https://www.reddit.com/r/#{post.subreddit}/comments/#{post.reddit_id}" %></td>
-<td><%= link_to post.url, post.url %></td>
-</tr>
-<% end %>
+<%= render partial: "post", collection: @censored_posts %>
 </table>
 
 <h2>Currently Monitoring</h2>
@@ -31,13 +44,7 @@ Deletion is checked by a search request, as posts removed from a subreddit can s
 <th>Title</th>
 <th>URL</th>
 </tr>
-<% @watching_posts.each do |post| %>
-<tr>
-<td><%= post.subreddit %></td>
-<td><%= link_to post.title, "https://www.reddit.com/r/#{post.subreddit}/comments/#{post.reddit_id}" %></td>
-<td><%= link_to post.url, post.url %></td>
-</tr>
-<% end %>
+<%= render partial: "post", collection: @watching_posts %>
 </table>
 
 </div>
