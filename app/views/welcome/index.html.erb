@@ -4,7 +4,20 @@
 
 <h1>Stephen C. Inglis</h1>
 
-<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>
+<p>
+The purpose of this web application is to showcase some small projects after learning ruby on rails.
+</p>
+
+<p>
+The <%= link_to "reddit censorship", reddit_path %> project examines a subreddit, examining all its new posts and seeing which ones are removed from the subreddit after one day.
+The data is availble to view as html or as json, and the most recent 1000 censored posts are kept on the application.
+</p>
+
+<p>
+The <%= link_to "Sudoku solver", sudoku_path %> project is a simple use of Markov chain Monte Carlo (MCMC) to solve Sudoku puzzles provided by the user.
+The problems are written to a database and solved asynchronously, and later refrehses of the page will display solutions (or failure of the simulation).
+The simulation could be run on the client side using javascript, displaying current progress as the simulation runs, but I decided I wanted to support solving even for devices that had very little computational power.
+</p>
 
 </div>
 </div>
