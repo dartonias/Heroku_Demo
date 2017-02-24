@@ -18,9 +18,6 @@ post_array = (1..10).map do |i|
   {"data" => this_hash}
 end
 
-# Sample returned from a search that should have no results
-search_body = {"kind": "Listing", "data": {"facets": { }, "modhash": "sm3cj7m03p2eb142deaef41183c2ce127f1f46c8127373f283", "children": [ ], "after": nil, "before": nil } }.to_json
-
 RSpec.describe RedditPost, type: :model do
   it "has appropriate fields" do
     post = RedditPost.create!(post_data)
@@ -47,20 +44,28 @@ RSpec.describe RedditPost, type: :model do
   it "responds to class method delete_old" do
     expect(RedditPost).to respond_to(:delete_old)
     RedditPost.add_to_watchlist(post_array)
-    stub_request(:get, /reddit.*search/).
-      to_return(:status => 200, :body => search_body, :headers => {})
-    # This return will assume that none of the search results came up, so they must have all been censored
+    # This return will assume that the first 5 of the search results came up, so they must have all been censored
+    count = 0
+    allow(RedditQuery).to receive(:search_one) do |subreddit, reddit_id|
+      count += 1
+      if count <= 5
+        post_array.sample(1)
+      else
+        []
+      end
+    end
     RedditPost.delete_old(-1.minutes)
-    expect(RedditPost.count).to eq(post_array.size)
+    expect(RedditPost.count).to eq(post_array.size - 5)
   end
   it "responds to class method delete_old_batch" do
     expect(RedditPost).to respond_to(:delete_old_batch)
     RedditPost.add_to_watchlist(post_array)
-    # Force the deletion to check immediately
+    # This return will assume that 5 of the search results came up, so those 5 must have been censored
     ENV['OLD_TIME_HOURS'] = '-1'
-    stub_request(:get, /reddit.*search/).
-      to_return(:status => 200, :body => search_body, :headers => {})
+    allow(RedditQuery).to receive(:search_many) do |sr, id|
+      post_array.sample(5)
+    end
     RedditPost.delete_old_batch
-    expect(RedditPost.count).to eq(post_array.size)
+    expect(RedditPost.count).to eq(post_array.size - 5)
   end
 end

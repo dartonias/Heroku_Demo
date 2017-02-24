@@ -90,7 +90,7 @@ class RedditPost < ActiveRecord::Base
             puts "data: #{data}" if debug
             # We'll double check that it was in our initial list
             if ids.delete(data["reddit_id"])
-              # Old an uncensored, we no longer care about you
+              # Old is uncensored, we no longer care about you
               RedditPost.where(censored: false, subreddit: sr, reddit_id: data["reddit_id"]).first.delete
             end
           end
