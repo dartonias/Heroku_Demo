@@ -12,6 +12,14 @@ Rows or columns that do not satisfy Sudoku rules are shown in red.
 </p>
 
 <p>
+The Sudoku puzzles are solved using <%= link_to "Markov chain Monte Carlo", 'https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo' %>, seeded with a random configuration that satisfies the sub-square constraint, but does not necessarily satisfy the row and column constraint of a Sudoku puzzle.
+Our basic move in this simulation is swapping two elements of a square, which will never violate the sub-square constraint, but may change where some of the rows and columns are satisfied.
+Using this with <%= link_to "simulated annealing", 'https://en.wikipedia.org/wiki/Simulated_annealing' %> and mapping the number of errors to the function we are minimizing, we are able to fairly well at solving most Sudoku puzzles.
+Interestingly, puzzles that are known as hard for humans to solve are also hard for the simulation to solve.
+This can be overcome using techniques such as <%= link_to "parallel tempering", 'https://en.wikipedia.org/wiki/Parallel_tempering' %>, but for a simple demonstration some failure cases are more interesting.
+</p>
+
+<p>
 If a problem is requested from the database and it already exists, it is brought to the top of the recent results and worked on if there is not yet a solution for the problem.
 </p>
 
@@ -19,18 +27,26 @@ If a problem is requested from the database and it already exists, it is brought
 
 <p>Valid modifiers are 
 <table class="args">
+<tr><td><code>search</code></td><td>(str) limits results that contain the substring in the name</td></tr>
 <tr><td><code>limit</code></td><td>(int) limits the number of entries returned</td></tr>
 </table>
 </p>
 
-<p><%= link_to "JSON results", sudoku_path(format: :json, limit: params[:limit]) %></p>
+<%= form_tag sudoku_path, :method => 'get' do %>
+    <%= text_field_tag :search, params[:search] %>
+    <%= submit_tag "Search", :name => nil %>
+<% end %>
+
+<p><%= link_to "JSON results", sudoku_path(format: :json, limit: params[:limit], search: params[:search]) %></p>
 
 <h2>Enter a puzzle</h2>
 
 <p>
-Zero (<code>0</code>) corresponds to no constraint in the initial Sudoku puzzle.
+Zero (<code>0</code>) or an empty cell corresponds to no constraint in the initial Sudoku puzzle.
 The numbers below are editable text fields, where you should enter the numbers corresponding to the initial Sudoku problem.
 Selecting an element, mouse scroll will let you change the value, or you can type a new value into the box.
+Pressing solve will submit the puzzle to the server to work on -- if you check back at a later time, it's progress will be shown below.
+The <code>Resubmit</code> button below puzzles with errors will resubmit the constraints to the server to attempt to solve again -- since the Monte Carlo simulation is seeded randomly each time, it may find a different or better solution in the same finite number of simulation steps.
 </p>
 
 <%= form_tag(controller: "sudoku_puzzles", action: "create", method: "post") do %>
@@ -44,11 +60,14 @@ Selecting an element, mouse scroll will let you change the value, or you can typ
       <% (0..2).each do |row| %>
         <tr>
         <% (0..8).each do |col| %>
-          <td> <%= number_field(:constraints, col + row*9 + row_group*9*3, in: 0..9, step: 1, value: 0, maxlength: 1) %>
+          <td> <%= number_field(:constraints, col + row*9 + row_group*9*3, in: 0..9, step: 1, value: "", maxlength: 1) %>
         <% end %>
       <% end %>
     <% end %>
   </table>
+  <p></p>
+  <%= label_tag(:name, "Your name:") %>
+  <%= text_field_tag(:name) %>
   <%= submit_tag("Solve") %>
 <% end %>
 

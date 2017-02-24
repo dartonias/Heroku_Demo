@@ -20,7 +20,11 @@
 
 <div class="col-sm-6">
 <table class="sudoku">
-  <caption><%= puzzle.status %></caption>
+  <caption><%= puzzle.status %>
+  <% if puzzle.name and puzzle.name.size > 0 %>
+  (last submitted by: <%= puzzle.name %>)
+  <% end %>
+  </caption>
   <colgroup><col><col><col>
   <colgroup><col><col><col>
   <colgroup><col><col><col>
@@ -38,7 +42,7 @@
 <% if puzzle.can_work_on? %>
   <%= form_tag(controller: "sudoku_puzzles", action: "create", method: "post") do %>
   <%= hidden_field_tag(:constraints_str, puzzle.constraints) %>
-  <%= submit_tag("Work on") %>
+  <%= submit_tag("Resubmit") %>
   <% end %>
 <% end %>
 

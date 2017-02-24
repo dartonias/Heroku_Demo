@@ -1,7 +1,7 @@
 class SudokuPuzzle < ActiveRecord::Base
   default_scope { order(updated_at: :desc) }
 
-  def self.new_puzzle(constraints)
+  def self.new_puzzle(constraints, name)
     # Check if the puzzle is in the database already, and return it if it is
     constraint_string = constraints.join("")
     sample = SudokuPuzzle.where(constraints: constraint_string).first
@@ -11,6 +11,9 @@ class SudokuPuzzle < ActiveRecord::Base
       # If we leave the solution, it will be used as a seed configuration
       # for the next simulation
       sample.solution = nil
+      if name.size > 0
+        sample.name = name
+      end
       sample.save
       return sample
     else
@@ -18,6 +21,9 @@ class SudokuPuzzle < ActiveRecord::Base
       # Convert the constraints to a string from an array of integers
       problem.constraints = constraints.join("")
       problem.status = "Submitted"
+      if name.size > 0
+        problem.name = name
+      end
       problem.save
       return problem
     end
@@ -48,6 +54,14 @@ class SudokuPuzzle < ActiveRecord::Base
     end
   end
 
+  def self.search(query)
+    if query and query.size > 0
+      where("name LIKE ? OR name LIKE ? OR name LIKE ?", "%#{query}%", "%#{query.downcase}%", "%#{query.capitalize}%")
+    else
+      all
+    end
+  end
+
   def is_error?(row,col)
     if !defined?(@row_conflicts)
       set_conflicts
@@ -69,9 +83,9 @@ class SudokuPuzzle < ActiveRecord::Base
     self.save
   end
 
-  def save_finished(solution)
+  def save_finished(solution, num_sweeps)
     self.solution = solution.join("")
-    self.status = "Solved"
+    self.status = "Solved in #{num_sweeps} sweeps"
     self.save
   end
 
@@ -81,14 +95,14 @@ class SudokuPuzzle < ActiveRecord::Base
   end
 
   def solved?
-    self.status == "Solved"
+    /Solved/ === self.status
   end
 
   def impossible?
-    self.status == "Impossible"
+    /Impossible/ === self.status
   end
 
   def can_work_on?
-    !(self.status == "Submitted") && !impossible? && !solved?
+    /errors/ === self.status
   end
 end

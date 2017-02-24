@@ -28,9 +28,11 @@ class SudokuSolver
     # Initialize the simulation, and calculate initial energy
     if !@db_entry.solved? && !@db_entry.impossible?
       @num_sweeps = (ENV['SUDOKU_NUM_SWEEPS'] || 10000).to_i
+      @sweep_num = 0
       if init_sim
         # Do sweeps (check energy after each step)
         @num_sweeps.times do
+          @sweep_num += 1
           break if do_sweep
         end
         # Save solution to database
@@ -89,7 +91,7 @@ class SudokuSolver
   def db_save_current
     # Save current progress or solution
     if @lowest_energy == 0
-      @db_entry.save_finished(@lowest_config)
+      @db_entry.save_finished(@lowest_config, @sweep_num)
     else
       @db_entry.save_current(@lowest_config, @lowest_energy)
     end
