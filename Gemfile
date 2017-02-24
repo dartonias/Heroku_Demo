@@ -34,6 +34,12 @@ gem 'puma'
 gem 'httparty'
 gem 'sucker_punch', '~> 2.0'
 
+group :development, :test do
+  gem 'rspec-rails', '~> 3.5'
+  gem 'webmock'
+end
+
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
