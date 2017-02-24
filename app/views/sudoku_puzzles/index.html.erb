@@ -43,11 +43,14 @@ If a problem is requested from the database and it already exists, it is brought
 
 <p>
 Zero (<code>0</code>) or an empty cell corresponds to no constraint in the initial Sudoku puzzle.
-The numbers below are editable text fields, where you should enter the numbers corresponding to the initial Sudoku problem.
+The cells below are editable text fields, where you should enter numbers in the cells corresponding to the initial Sudoku problem.
 Selecting an element, mouse scroll will let you change the value, or you can type a new value into the box.
 Pressing solve will submit the puzzle to the server to work on -- if you check back at a later time, it's progress will be shown below.
-The <code>Resubmit</code> button below puzzles with errors will resubmit the constraints to the server to attempt to solve again -- since the Monte Carlo simulation is seeded randomly each time, it may find a different or better solution in the same finite number of simulation steps.
+The <code>Resubmit</code> button below puzzles with errors will resubmit the constraints to the server to attempt to solve again.
+Since the Monte Carlo simulation is seeded randomly each time, it may find a different or better solution in the same finite number of simulation steps.
 </p>
+
+<p>The name field is optional, and puzzled can be filtered by submitter name in the results.</p>
 
 <%= form_tag(controller: "sudoku_puzzles", action: "create", method: "post") do %>
   <table class="sudoku">
