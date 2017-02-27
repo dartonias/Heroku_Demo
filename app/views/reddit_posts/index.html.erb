@@ -14,24 +14,29 @@ Deletion is checked by a search request, as posts removed from a subreddit can s
 The subreddits chosen are simply those that I suspect remove enough posts to gather interesting data on the problem.
 </p>
 
-<p>Valid modifiers are 
+<p>Valid modifiers as a query in the URL are the following:
 <table class="args">
 <tr><td><code>search</code></td><td>(str) limits results that contain the substring in the title</td></tr>
-<tr><td><code>regexp</code></td><td>(str) limits results that contain the regular expression in the title</td></tr>
+<tr><td><code>regexp</code></td><td>(str) limits results that contain the regular expression in the title, will override search command</td></tr>
+<tr><td><code>subreddit</code></td><td>(str) limits results that contain the substring in the subreddit name</td></tr>
 <tr><td><code>limit</code></td><td>(int) limits the number of entries returned</td></tr>
 </table>
 </p>
 
 <%= form_tag reddit_path, :method => 'get' do %>
     <%= text_field_tag :search, params[:search] %>
-    <%= submit_tag "Search", :name => nil %>
-<% end %>
-<%= form_tag reddit_path, :method => 'get' do %>
+    <%= label :search, 'Search' %>
+</p>
     <%= text_field_tag :regexp, params[:regexp] %>
-    <%= submit_tag "Regexp", :name => nil %>
+    <%= label :search, 'Regular Expression' %>
+</p>
+    <%= text_field_tag :subreddit, params[:subreddit] %>
+    <%= label :search, 'Subreddit' %>
+</p>
+    <%= submit_tag "Filter", :name => nil %>
 <% end %>
 
-<p><%= link_to "JSON results", reddit_path(format: :json, search: params[:search], regexp: params[:regexp], limit: params[:limit]) %></p>
+<p><%= link_to "JSON results", reddit_path(format: :json, search: params[:search], regexp: params[:regexp], subreddit: params[:subreddit], limit: params[:limit]) %></p>
 
 <h2>Censored</h2>
 <table class="table table-striped">

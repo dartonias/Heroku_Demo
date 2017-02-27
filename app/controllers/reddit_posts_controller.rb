@@ -5,10 +5,18 @@ class RedditPostsController < ApplicationController
     limit = (params[:limit] || 25).to_i
     @censored_posts = []
     @watching_posts = []
+    if params[:regexp] and params[:regexp].size > 0
+      params[:search] = ''
+    end
     sr_count = 0
     subreddits.each do |sr|
+      limit_subs = false
+      if params[:subreddit] && params[:subreddit].size > 0
+        limit_subs = true
+        next unless /#{params[:subreddit]}/ === sr
+      end
       sr_count += 1
-      if sr_count < subreddits.size
+      if sr_count < subreddits.size && !limit_subs
         censored_lim = [limit/subreddits.size, 1].max
         watching_lim = [limit/subreddits.size, 1].max
       else

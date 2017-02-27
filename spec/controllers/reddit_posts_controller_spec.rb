@@ -64,5 +64,8 @@ RSpec.describe RedditPostsController, type: :controller do
     get :index, {:regexp => '^Un'}
     expect(assigns(:censored_posts).size).to eq(post_array.size/2)
     expect(assigns(:watching_posts).size).to eq(post_array.size/2 - 1)
+    get :index, {:subreddit => '1'}
+    expect(assigns(:censored_posts).size).to eq(post_array.size/4)
+    expect(assigns(:watching_posts).size).to eq(post_array.size/4)
   end
 end
