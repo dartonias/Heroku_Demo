@@ -5,6 +5,21 @@ constraints_array = puzzle_input[0]
 # Example solution for the unconstrained puzzle above, contains no errors
 solution_str = "479586213315472986628319574892643157134957862567821349753268491946135728281794635"
 solution_array = solution_str.split("").map {|i| i.to_i}
+failed_solution = "819752346523641879674893251352967184186345792947128635431279568268534917795816423"
+failures = [[1,4],[2,3],[4,4],[8,3]]
+
+# failures are shown below, with zero indexing into (row,col)
+# 819 752 346
+# 523 641 879
+# 674 893 251
+
+# 352 967 184
+# 186 345 792
+# 947 128 635
+
+# 431 279 568
+# 268 534 917
+# 795 816 423
 
 RSpec.describe SudokuPuzzle, type: :model do
   it "responds to class method new_puzzle" do
@@ -19,10 +34,24 @@ RSpec.describe SudokuPuzzle, type: :model do
   end
   it "responds to instance method is_error?" do
     is_expected.to respond_to(:is_error?)
+  end
+  it "reports no errors in the case of a solved puzzle" do
     puzzle.solution = solution_str
     (0..8).each do |row|
       (0..8).each do |col|
         expect(puzzle.is_error?(row,col)).to be(false)
+      end
+    end
+  end
+  it "reports errors in the case of an unsolved puzzle" do
+    puzzle.solution = failed_solution
+    (0..8).each do |row|
+      (0..8).each do |col|
+        if failures.include?([row,col])
+          expect(puzzle.is_error?(row,col)).to be(true)
+        else
+          expect(puzzle.is_error?(row,col)).to be(false)
+        end
       end
     end
   end
