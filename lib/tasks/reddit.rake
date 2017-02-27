@@ -7,8 +7,10 @@ namespace :reddit do
     puts "Analyzing subreddits: #{subreddits}"
     subreddits.each do |sr|
       data = RedditQuery.new_posts(sr)
-      puts "#{sr} gave #{data.size} posts"
-      RedditPost.add_to_watchlist(data)
+      if data
+        puts "#{sr} gave #{data.size} posts"
+        RedditPost.add_to_watchlist(data)
+      end
     end
   end
 
