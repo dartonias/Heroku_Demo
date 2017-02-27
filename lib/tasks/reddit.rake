@@ -4,8 +4,10 @@ namespace :reddit do
   task get_new: :environment do
     subreddits = ENV['REDDIT_WATCH_SUBREDDITS'] || 'politics'
     subreddits = subreddits.split
+    puts "Analyzing subreddits: #{subreddits}"
     subreddits.each do |sr|
       data = RedditQuery.new_posts(sr)
+      puts "#{sr} gave #{data.size} posts"
       RedditPost.add_to_watchlist(data)
     end
   end
