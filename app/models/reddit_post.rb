@@ -1,4 +1,7 @@
 class RedditPost < ActiveRecord::Base
+  scope :censored, -> { where(censored: true) }
+  scope :uncensored, -> { where(censored: false) }
+  scope :subreddit, ->(sr) { where(subreddit: sr) }
 
   # Look through the json data and
   # add any new entries to the database to watch

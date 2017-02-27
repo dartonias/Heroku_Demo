@@ -1,7 +1,8 @@
 require 'rails_helper'
 
-puzzle = [[0]*81,'solvable']
-constraints_array = puzzle[0]
+puzzle_input = [[0]*81,'solvable']
+constraints_array = puzzle_input[0]
+# Example solution for the unconstrained puzzle above, contains no errors
 solution_str = "479586213315472986628319574892643157134957862567821349753268491946135728281794635"
 solution_array = solution_str.split("").map {|i| i.to_i}
 
@@ -12,70 +13,70 @@ RSpec.describe SudokuPuzzle, type: :model do
   it "responds to class method search" do
     expect(SudokuPuzzle).to respond_to(:search)
   end
-  subject {SudokuPuzzle.new_puzzle(*puzzle)}
+  subject(:puzzle){SudokuPuzzle.new_puzzle(*puzzle_input)}
   it "responds to instance method set_conflicts" do
     is_expected.to respond_to(:set_conflicts)
   end
   it "responds to instance method is_error?" do
     is_expected.to respond_to(:is_error?)
-    subject.solution = solution_str
+    puzzle.solution = solution_str
     (0..8).each do |row|
       (0..8).each do |col|
-        expect(subject.is_error?(row,col)).to be(false)
+        expect(puzzle.is_error?(row,col)).to be(false)
       end
     end
   end
   it "responds to instance method solution_array" do
     is_expected.to respond_to(:solution_array)
-    subject.solution = solution_str
-    expect(subject.solution_array).to eq(solution_array)
+    puzzle.solution = solution_str
+    expect(puzzle.solution_array).to eq(solution_array)
   end
   it "responds to instance method constraints_array" do
     is_expected.to respond_to(:constraints_array)
-    expect(subject.constraints_array).to eq(constraints_array)
+    expect(puzzle.constraints_array).to eq(constraints_array)
   end
   it "responds to instance method save_current" do
     is_expected.to respond_to(:save_current)
     num_errors = 2
-    subject.save_current(solution_array,num_errors)
-    expect(subject.solution).to eq(solution_str)
-    expect(subject.status).to match(/errors/)
-    expect(subject.status).to match(/#{num_errors}/)
+    puzzle.save_current(solution_array,num_errors)
+    expect(puzzle.solution).to eq(solution_str)
+    expect(puzzle.status).to match(/errors/)
+    expect(puzzle.status).to match(/#{num_errors}/)
     expect(SudokuPuzzle.count).to eq(1)
   end
   it "responds to instance method save_finished" do
     is_expected.to respond_to(:save_finished)
     num_sweeps = 1234
-    subject.save_finished(solution_array, num_sweeps)
-    expect(subject.solution).to eq(solution_str)
-    expect(subject.status).to match(/Solved/)
-    expect(subject.status).to match(/#{num_sweeps}/)
+    puzzle.save_finished(solution_array, num_sweeps)
+    expect(puzzle.solution).to eq(solution_str)
+    expect(puzzle.status).to match(/Solved/)
+    expect(puzzle.status).to match(/#{num_sweeps}/)
     expect(SudokuPuzzle.count).to eq(1)
   end
   it "responds to instance method save_impossible" do
     is_expected.to respond_to(:save_impossible)
-    subject.save_impossible
-    expect(subject.status).to match(/Impossible/)
+    puzzle.save_impossible
+    expect(puzzle.status).to match(/Impossible/)
     expect(SudokuPuzzle.count).to eq(1)
   end
   it "responds to instance method solved?" do
     is_expected.to respond_to(:solved?)
-    expect(subject.solved?).to be false
+    expect(puzzle.solved?).to be false
     num_sweeps = 1234
-    subject.save_finished(solution_array, num_sweeps)
-    expect(subject.solved?).to be true
+    puzzle.save_finished(solution_array, num_sweeps)
+    expect(puzzle.solved?).to be true
   end
   it "responds to instance method impossible?" do
     is_expected.to respond_to(:impossible?)
-    expect(subject.impossible?).to be false
-    subject.save_impossible
-    expect(subject.impossible?).to be true
+    expect(puzzle.impossible?).to be false
+    puzzle.save_impossible
+    expect(puzzle.impossible?).to be true
   end
   it "responds to instance method can_work_on?" do
     is_expected.to respond_to(:can_work_on?)
-    expect(subject.can_work_on?).to be false
+    expect(puzzle.can_work_on?).to be false
     num_errors = 2
-    subject.save_current(solution_array,num_errors)
-    expect(subject.can_work_on?).to be true
+    puzzle.save_current(solution_array,num_errors)
+    expect(puzzle.can_work_on?).to be true
   end
 end

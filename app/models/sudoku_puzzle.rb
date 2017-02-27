@@ -21,7 +21,7 @@ class SudokuPuzzle < ActiveRecord::Base
       # Convert the constraints to a string from an array of integers
       problem.constraints = constraints.join("")
       problem.status = "Submitted"
-      if name.size > 0
+      if name && name.size > 0
         problem.name = name
       end
       problem.save
