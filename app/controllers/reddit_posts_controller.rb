@@ -9,11 +9,11 @@ class RedditPostsController < ApplicationController
     subreddits.each do |sr|
       sr_count += 1
       if sr_count < subreddits.size
-        censored_lim = limit/subreddits.size
-        watching_lim = limit/subreddits.size
+        censored_lim = [limit/subreddits.size, 1].max
+        watching_lim = [limit/subreddits.size, 1].max
       else
-        censored_lim = limit - @censored_posts.size
-        watching_lim = limit - @watching_posts.size
+        censored_lim = [limit - @censored_posts.size, 1].max
+        watching_lim = [limit - @watching_posts.size, 1].max
       end
       @censored_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).where(censored: true).where(subreddit: sr).limit(censored_lim))
       @watching_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).where(censored: false).where(subreddit: sr).limit(watching_lim))

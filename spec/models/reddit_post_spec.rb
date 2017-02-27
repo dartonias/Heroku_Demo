@@ -27,21 +27,21 @@ RSpec.describe RedditPost, type: :model do
     expect(post).to have_attributes(:title => post_data[:title])
     expect(post).to have_attributes(:url => post_data[:url])
   end
-  it "responds to class method add_to_watchlist" do
+  it "responds to class method add_to_watchlist and adds posts to database" do
     expect(RedditPost).to respond_to(:add_to_watchlist)
     old_count = RedditPost.all.count
     RedditPost.add_to_watchlist(post_array)
     expect(RedditPost.all.count - old_count).to eq(post_array.size)
   end
-  it "responds to class method search" do
+  it "responds to class method search and returns an ActiveRecord_Relation" do
     expect(RedditPost).to respond_to(:search)
     expect(RedditPost.search('test')).to be_a(RedditPost::ActiveRecord_Relation)
   end
-  it "responds to class method regexp" do
+  it "responds to class method regexp and returns an ActiveRecord_Relation" do
     expect(RedditPost).to respond_to(:regexp)
     expect(RedditPost.search('test')).to be_a(RedditPost::ActiveRecord_Relation)
   end
-  it "responds to class method delete_old" do
+  it "responds to class method delete_old that removes entries from the database" do
     expect(RedditPost).to respond_to(:delete_old)
     RedditPost.add_to_watchlist(post_array)
     # This return will assume that the first 5 of the search results came up, so they must have all been censored
@@ -57,7 +57,7 @@ RSpec.describe RedditPost, type: :model do
     RedditPost.delete_old(-1.minutes)
     expect(RedditPost.count).to eq(post_array.size - 5)
   end
-  it "responds to class method delete_old_batch" do
+  it "responds to class method delete_old_batch which can delete many entries from the database" do
     expect(RedditPost).to respond_to(:delete_old_batch)
     RedditPost.add_to_watchlist(post_array)
     # This return will assume that 5 of the search results came up, so those 5 must have been censored
