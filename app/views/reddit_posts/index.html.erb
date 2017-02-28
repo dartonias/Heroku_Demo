@@ -3,12 +3,17 @@
 <div class="col-sm-12">
 
 <h1>Reddit Censorship</h1>
+
 <p>A small project to examine posts that are deleted from certain active subreddits.
 Monitored posts are those currently being watched, while censored posts are those that have been removed by a subreddit.
 Note, we do not look at the mechanism for such removals, whether automatic or manually by a moderator.</p>
+
 <p>Posts are scraped every hour from <code>reddit.com/r/&lt;subreddit&gt;/new</code>.
 Once posts are one day old, we check if they have been deleted from the subreddit; if they have we add them to the censored category.
-Deletion is checked by a search request, as posts removed from a subreddit can still be reached by their original URL, but no longer show up in searches.</p>
+Deletion is checked by a search request, as posts removed from a subreddit can still be reached by their original URL, but no longer show up in searches.
+A total of the most recent 1000 censored posts are kept in the database, but only the most 25 recent are shown on this page.
+This can be modified with the <code>limit</code> query.
+</p>
 
 <p>
 The subreddits chosen are simply those that I suspect remove enough posts to gather interesting data on the problem.
@@ -34,6 +39,7 @@ The subreddits chosen are simply those that I suspect remove enough posts to gat
     <%= label :search, 'Subreddit' %>
 </p>
     <%= submit_tag "Filter", :name => nil %>
+    <%= button_tag "Reset", type: :reset %>
 <% end %>
 
 <p><%= link_to "JSON results", reddit_path(format: :json, search: params[:search], regexp: params[:regexp], subreddit: params[:subreddit], limit: params[:limit]) %></p>

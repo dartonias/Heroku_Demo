@@ -34,7 +34,10 @@ If a problem is requested from the database and it already exists, it is brought
 
 <%= form_tag sudoku_path, :method => 'get' do %>
     <%= text_field_tag :search, params[:search] %>
+    <%= label :search, 'Submitter name' %>
+</p>
     <%= submit_tag "Search", :name => nil %>
+    <%= button_tag "Reset", type: :reset %>
 <% end %>
 
 <p><%= link_to "JSON results", sudoku_path(format: :json, limit: params[:limit], search: params[:search]) %></p>
