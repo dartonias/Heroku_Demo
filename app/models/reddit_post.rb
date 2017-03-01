@@ -2,6 +2,12 @@ class RedditPost < ActiveRecord::Base
   scope :censored, -> { where(censored: true) }
   scope :uncensored, -> { where(censored: false) }
   scope :subreddit, ->(sr) { where(subreddit: sr) }
+  
+  def self.matured
+    old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
+    oldest = (DateTime.now - old_limit).to_i
+    where("created_utc < ?", oldest)
+  end
 
   # Look through the json data and
   # add any new entries to the database to watch
@@ -71,19 +77,17 @@ class RedditPost < ActiveRecord::Base
   # RedditPost.check_censored_batch
   def self.check_censored_batch
     # Get the seconds since the epoch to compare with created_utc
-    old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
     batch_size = (ENV['REDDIT_BATCH_SIZE'] || 20).to_i
     debug = ENV['DEBUG_CHECK_CENSORED_BATCH']
     puts "Batch size: #{batch_size}" if debug
-    oldest = (DateTime.now - old_limit).to_i
     # Array of distinct subreddits
     srs = RedditPost.distinct.pluck(:subreddit)
     srs.each do |sr|
       offset = 0
-      num = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).where("created_utc < ?", oldest).offset(offset).limit(batch_size).count
+      num = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).matured.offset(offset).limit(batch_size).count
       puts "num: #{num}" if debug
       while num > 0 do
-        ids = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).where("created_utc < ?", oldest).offset(offset).limit(batch_size).pluck(:reddit_id)
+        ids = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).matured.offset(offset).limit(batch_size).pluck(:reddit_id)
         puts "sr: #{sr}, ids: #{ids}" if debug
         # Process here
         search_result = RedditQuery.search_many(sr,ids)
@@ -106,7 +110,7 @@ class RedditPost < ActiveRecord::Base
         end
         # End while logic
         offset += batch_size
-        num = RedditPost.order(:created_utc).where(censored: false).where("created_utc < ?", oldest).offset(offset).limit(batch_size).count
+        num = RedditPost.order(:created_utc).where(censored: false).matured.offset(offset).limit(batch_size).count
       end
     end
   end
