@@ -1,8 +1,11 @@
 require 'rails_helper'
 
+old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
+oldest = (DateTime.now - old_limit).to_i - 1
+
 post_data = {reddit_id: 'zzz123',
   subreddit: 'some_sub',
-  created_utc: DateTime.now.to_i,
+  created_utc: oldest,
   title: 'Unoriginal title number 5',
   url: 'someurl.com/somearticle'}
 
