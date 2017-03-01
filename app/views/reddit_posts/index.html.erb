@@ -5,13 +5,13 @@
 <h1>Reddit Censorship</h1>
 
 <p>A small project to examine posts that are deleted from certain active subreddits.
-Monitored posts are those currently being watched, while censored posts are those that have been removed by a subreddit.
+Censored posts are those that have been removed by a subreddit, while uncensored posts are those that were not removed after 24 hours.
 Note, we do not look at the mechanism for such removals, whether automatic or manually by a moderator.</p>
 
 <p>Posts are scraped every hour from <code>reddit.com/r/&lt;subreddit&gt;/new</code>.
 Once posts are one day old, we check if they have been deleted from the subreddit; if they have we add them to the censored category.
 Deletion is checked by a search request, as posts removed from a subreddit can still be reached by their original URL, but no longer show up in searches.
-A total of the most recent 1000 censored posts are kept in the database, but only the most 25 recent are shown on this page.
+A total of the most recent 1000 censored posts and 1000 uncensored posts are kept in the database, but only the most 25 recent are shown on this page.
 This can be modified with the <code>limit</code> query.
 </p>
 
