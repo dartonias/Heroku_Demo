@@ -18,8 +18,8 @@ namespace :reddit do
   task update_censored: :environment do
     RedditPost.check_censored_batch
     # Only keep the most recent 1000 uncensored that were uncensored after the check
-    RedditPost.order(created_utc: :desc).where(censored: false).matured.offset(1000).destroy_all
+    RedditPost.order(created_utc: :desc).uncensored.matured.offset(1000).destroy_all
     # Only keep the most recent 1000 censored, which must be after the check by definition
-    RedditPost.order(created_utc: :desc).where(censored: true).offset(1000).destroy_all
+    RedditPost.order(created_utc: :desc).censored.offset(1000).destroy_all
   end
 end
