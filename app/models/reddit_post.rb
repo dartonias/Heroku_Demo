@@ -68,12 +68,12 @@ class RedditPost < ActiveRecord::Base
   # Failed queries to reddit do not modify the database entries
   # This method uses batch query to reduce number of requests to reddit
   # useage
-  # RedditPost.delete_old_batch
-  def self.delete_old_batch
+  # RedditPost.check_censored_batch
+  def self.check_censored_batch
     # Get the seconds since the epoch to compare with created_utc
     old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
     batch_size = (ENV['REDDIT_BATCH_SIZE'] || 20).to_i
-    debug = ENV['DEBUG_DELETE_OLD_BATCH']
+    debug = ENV['DEBUG_CHECK_CENSORED_BATCH']
     puts "Batch size: #{batch_size}" if debug
     oldest = (DateTime.now - old_limit).to_i
     # Array of distinct subreddits
@@ -92,10 +92,7 @@ class RedditPost < ActiveRecord::Base
             data = post_params(res)
             puts "data: #{data}" if debug
             # We'll double check that it was in our initial list
-            if ids.delete(data["reddit_id"])
-              # Old is uncensored, we no longer care about you
-              RedditPost.where(censored: false, subreddit: sr, reddit_id: data["reddit_id"]).first.delete
-            end
+            ids.delete(data["reddit_id"])
           end
           # Ones that were not found must have been censored
           ids.each do |cen_id|

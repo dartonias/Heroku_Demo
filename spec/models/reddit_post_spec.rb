@@ -57,15 +57,15 @@ RSpec.describe RedditPost, type: :model do
     RedditPost.delete_old(-1.minutes)
     expect(RedditPost.count).to eq(post_array.size - 5)
   end
-  it "responds to class method delete_old_batch which can delete many entries from the database" do
-    expect(RedditPost).to respond_to(:delete_old_batch)
+  it "responds to class method check_censored_batch which can delete many entries from the database" do
+    expect(RedditPost).to respond_to(:check_censored_batch)
     RedditPost.add_to_watchlist(post_array)
     # This return will assume that 5 of the search results came up, so those 5 must have been censored
     ENV['OLD_TIME_HOURS'] = '-1'
     allow(RedditQuery).to receive(:search_many) do |sr, id|
       post_array.sample(5)
     end
-    RedditPost.delete_old_batch
-    expect(RedditPost.count).to eq(post_array.size - 5)
+    RedditPost.check_censored_batch
+    expect(RedditPost.censored.count).to eq(post_array.size - 5)
   end
 end
