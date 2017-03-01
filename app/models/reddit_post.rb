@@ -9,6 +9,12 @@ class RedditPost < ActiveRecord::Base
     where("created_utc < ?", oldest)
   end
 
+  def self.fresh
+    old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
+    oldest = (DateTime.now - old_limit).to_i
+    where("created_utc >= ?", oldest)
+  end
+
   # Look through the json data and
   # add any new entries to the database to watch
   # usage

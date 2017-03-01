@@ -4,6 +4,7 @@ class RedditPostsController < ApplicationController
     subreddits = RedditPost.pluck(:subreddit).uniq
     limit = (params[:limit] || 25).to_i
     @censored_posts = []
+    @uncensored_posts = []
     @watching_posts = []
     if params[:regexp] and params[:regexp].size > 0
       params[:search] = ''
@@ -18,13 +19,16 @@ class RedditPostsController < ApplicationController
       sr_count += 1
       if sr_count < subreddits.size && !limit_subs
         censored_lim = [limit/subreddits.size, 1].max
+        uncensored_lim = [limit/subreddits.size, 1].max
         watching_lim = [limit/subreddits.size, 1].max
       else
         censored_lim = [limit - @censored_posts.size, 1].max
+        uncensored_lim = [limit - @censored_posts.size, 1].max
         watching_lim = [limit - @watching_posts.size, 1].max
       end
       @censored_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).censored.matured.subreddit(sr).limit(censored_lim))
-      @watching_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).uncensored.matured.subreddit(sr).limit(watching_lim))
+      @uncensored_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).uncensored.matured.subreddit(sr).limit(censored_lim))
+      @watching_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).fresh.subreddit(sr).limit(watching_lim))
     end
     respond_to do |format|
       format.html

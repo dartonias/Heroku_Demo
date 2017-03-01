@@ -50,25 +50,26 @@ RSpec.describe RedditPostsController, type: :controller do
     expect(RedditPost.all.count).to eq(post_array.size)
     get :index
     expect(assigns(:censored_posts).size).to eq(post_array.size/2)
-    expect(assigns(:watching_posts).size).to eq(post_array.size/2)
+    expect(assigns(:uncensored_posts).size).to eq(post_array.size/2)
     assigns(:censored_posts).each do |post|
       expect(post[:censored]).to be true
     end
-    assigns(:watching_posts).each do |post|
+    assigns(:uncensored_posts).each do |post|
       expect(post[:censored]).to be false
     end
     num_lim = 6
     get :index, {:limit => num_lim}
     expect(assigns(:censored_posts).size).to eq(num_lim)
-    expect(assigns(:watching_posts).size).to eq(num_lim)
+    expect(assigns(:uncensored_posts).size).to eq(num_lim)
     get :index, {:search => 'unique'}
     expect(assigns(:censored_posts).size).to eq(0)
-    expect(assigns(:watching_posts).size).to eq(1)
+    expect(assigns(:uncensored_posts).size).to eq(1)
     get :index, {:regexp => '^Un'}
     expect(assigns(:censored_posts).size).to eq(post_array.size/2)
-    expect(assigns(:watching_posts).size).to eq(post_array.size/2 - 1)
+    expect(assigns(:uncensored_posts).size).to eq(post_array.size/2 - 1)
     get :index, {:subreddit => '1'}
     expect(assigns(:censored_posts).size).to eq(post_array.size/4)
-    expect(assigns(:watching_posts).size).to eq(post_array.size/4)
+    expect(assigns(:uncensored_posts).size).to eq(post_array.size/4)
   end
+  pending "add some examples to test @watching_posts"
 end
