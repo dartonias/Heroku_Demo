@@ -26,9 +26,9 @@ class RedditPostsController < ApplicationController
         uncensored_lim = [limit - @censored_posts.size, 1].max
         watching_lim = [limit - @watching_posts.size, 1].max
       end
-      @censored_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).censored.matured.subreddit(sr).limit(censored_lim))
-      @uncensored_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).uncensored.matured.subreddit(sr).limit(censored_lim))
-      @watching_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).fresh.subreddit(sr).limit(watching_lim))
+      @censored_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).censored.matured.subreddit(sr).new_order.limit(censored_lim))
+      @uncensored_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).uncensored.matured.subreddit(sr).new_order.limit(censored_lim))
+      @watching_posts.concat(RedditPost.search(params[:search]).regexp(params[:regexp]).fresh.subreddit(sr).new_order.limit(watching_lim))
     end
     respond_to do |format|
       format.html

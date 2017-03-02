@@ -19,3 +19,4 @@
 /.ruby-version
 .rake_tasks~
 test.rb
+get_db

@@ -4,7 +4,13 @@ require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
-Bundler.require(*Rails.groups)
+#Bundler.require(*Rails.groups)
+
+require File.expand_path('./app/helpers/mathn_workaround.rb')
+
+MathnWorkaround.intercept do
+    Bundler.require(*Rails.groups)
+end
 
 module RubyGettingStarted
   class Application < Rails::Application

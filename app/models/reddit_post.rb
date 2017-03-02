@@ -1,5 +1,6 @@
 class RedditPost < ActiveRecord::Base
   scope :old_order, -> { order(:created_utc) }
+  scope :new_order, -> { order(:created_utc => :desc) }
   scope :censored, -> { where(censored: true) }
   scope :uncensored, -> { where(censored: false) }
   scope :subreddit, ->(sr) { where(subreddit: sr) }
@@ -16,6 +17,11 @@ class RedditPost < ActiveRecord::Base
     where("created_utc >= ?", oldest)
   end
 
+  # Do processing here for Bayesian machine learning censorship
+  def trim_title
+    self.title
+  end
+
   # Look through the json data and
   # add any new entries to the database to watch
   # usage
@@ -25,9 +31,12 @@ class RedditPost < ActiveRecord::Base
       json_data.each do |post|
         data = post_params(post)
         # Not found, so add it to the database
+        new_posts = []
         if RedditPost.where({reddit_id: data["reddit_id"], subreddit: data["subreddit"]}).count < 1
-          RedditPost.create(data)
+          new_posts << RedditPost.create(data)
         end
+        # Could run this asynchronously too, but this block is only run from asynchronous rake tasks already
+        RedditClassifyJob.new.perform(new_posts)
       end
     end
   end

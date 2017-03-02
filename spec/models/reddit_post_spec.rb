@@ -30,6 +30,8 @@ RSpec.describe RedditPost, type: :model do
   it "responds to class method add_to_watchlist and adds posts to database" do
     expect(RedditPost).to respond_to(:add_to_watchlist)
     old_count = RedditPost.all.count
+    # Mocking RedditClassifyJob.new.perform(new_posts)
+    allow_any_instance_of(RedditClassifyJob).to receive(:perform)
     RedditPost.add_to_watchlist(post_array)
     expect(RedditPost.all.count - old_count).to eq(post_array.size)
   end
@@ -43,6 +45,8 @@ RSpec.describe RedditPost, type: :model do
   end
   it "responds to class method delete_old that removes entries from the database" do
     expect(RedditPost).to respond_to(:delete_old)
+    # Mocking RedditClassifyJob.new.perform(new_posts)
+    allow_any_instance_of(RedditClassifyJob).to receive(:perform)
     RedditPost.add_to_watchlist(post_array)
     # This return will assume that the first 5 of the search results came up, so they must have all been censored
     count = 0
@@ -59,6 +63,8 @@ RSpec.describe RedditPost, type: :model do
   end
   it "responds to class method check_censored_batch which can delete many entries from the database" do
     expect(RedditPost).to respond_to(:check_censored_batch)
+    # Mocking RedditClassifyJob.new.perform(new_posts)
+    allow_any_instance_of(RedditClassifyJob).to receive(:perform)
     RedditPost.add_to_watchlist(post_array)
     # This return will assume that 5 of the search results came up, so those 5 must have been censored
     ENV['OLD_TIME_HOURS'] = '-1'

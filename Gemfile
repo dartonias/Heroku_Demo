@@ -33,6 +33,7 @@ gem 'spring',        group: :development
 gem 'puma'
 gem 'httparty'
 gem 'sucker_punch', '~> 2.0'
+gem 'classifier'
 
 group :development, :test do
   gem 'rspec-rails', '~> 3.5'
