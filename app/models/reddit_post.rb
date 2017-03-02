@@ -19,7 +19,7 @@ class RedditPost < ActiveRecord::Base
 
   # Do processing here for Bayesian machine learning censorship
   def trim_title
-    self.title
+    self.title.downcase.gsub(/[^0-9a-z ]/i, '')
   end
 
   # Look through the json data and
