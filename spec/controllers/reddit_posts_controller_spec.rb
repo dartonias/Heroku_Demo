@@ -45,7 +45,7 @@ RSpec.describe RedditPostsController, type: :controller do
     expect(assigns(:censored_posts)).to eq([])
     expect(assigns(:watching_posts)).to eq([])
   end
-  it "defines the expected @censored_posts and @watching_posts given arguments" do
+  it "defines the expected @censored_posts and @uncensored_posts given arguments" do
     RedditPost.create!(post_array)
     expect(RedditPost.all.count).to eq(post_array.size)
     get :index

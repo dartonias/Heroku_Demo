@@ -1,4 +1,5 @@
 class RedditPost < ActiveRecord::Base
+  scope :old_order, -> { order(:created_utc) }
   scope :censored, -> { where(censored: true) }
   scope :uncensored, -> { where(censored: false) }
   scope :subreddit, ->(sr) { where(subreddit: sr) }
@@ -56,7 +57,7 @@ class RedditPost < ActiveRecord::Base
     # Get the seconds since the epoch to compare with created_utc
     oldest = (DateTime.now - old_limit).to_i
     # Only returns objects older than now - old_limit
-    RedditPost.where(censored: false).where("created_utc < ?", oldest).each do |post|
+    RedditPost.uncensored.where("created_utc < ?", oldest).each do |post|
       # Check if its censored, and if so flag as censored
       search_result = RedditQuery.search_one(post.subreddit, post.reddit_id)
       # If no response from the server, leave it for now
@@ -90,10 +91,10 @@ class RedditPost < ActiveRecord::Base
     srs = RedditPost.distinct.pluck(:subreddit)
     srs.each do |sr|
       offset = 0
-      num = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).matured.offset(offset).limit(batch_size).count
+      num = RedditPost.old_order.uncensored.subreddit(sr).matured.offset(offset).limit(batch_size).count
       puts "num: #{num}" if debug
       while num > 0 do
-        ids = RedditPost.order(:created_utc).where(censored: false, subreddit: sr).matured.offset(offset).limit(batch_size).pluck(:reddit_id)
+        ids = RedditPost.old_order.uncensored.subreddit(sr).matured.offset(offset).limit(batch_size).pluck(:reddit_id)
         puts "sr: #{sr}, ids: #{ids}" if debug
         # Process here
         search_result = RedditQuery.search_many(sr,ids)
@@ -106,7 +107,7 @@ class RedditPost < ActiveRecord::Base
           end
           # Ones that were not found must have been censored
           ids.each do |cen_id|
-            post = RedditPost.where(censored: false, subreddit: sr, reddit_id: cen_id).first
+            post = RedditPost.uncensored.subreddit(sr).where(reddit_id: cen_id).first
             post.censored = true
             post.save
           end
@@ -116,7 +117,7 @@ class RedditPost < ActiveRecord::Base
         end
         # End while logic
         offset += batch_size
-        num = RedditPost.order(:created_utc).where(censored: false).matured.offset(offset).limit(batch_size).count
+        num = RedditPost.old_order.uncensored.matured.offset(offset).limit(batch_size).count
       end
     end
   end
