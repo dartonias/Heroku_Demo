@@ -17,9 +17,12 @@ namespace :reddit do
   desc "Update censored articles and manage the database size to 2000 total entries older than ENV['OLD_TIME_HOURS']"
   task update_censored: :environment do
     RedditPost.check_censored_batch
-    # Only keep the most recent 1000 uncensored that were uncensored after the check
-    RedditPost.order(created_utc: :desc).uncensored.matured.offset(1000).destroy_all
-    # Only keep the most recent 1000 censored, which must be after the check by definition
-    RedditPost.order(created_utc: :desc).censored.offset(1000).destroy_all
+    srs = RedditPost.distinct.pluck(:subreddit)
+    srs.each do |sr|
+      # Only keep the most recent 500 uncensored per subreddit that were uncensored after the check
+      RedditPost.new_order.subreddit(sr).uncensored.matured.offset(500).destroy_all
+      # Only keep the most recent 500 censored per subreddit, which must be after the check by definition
+      RedditPost.new_order.subreddit(sr).censored.offset(500).destroy_all
+    end
   end
 end

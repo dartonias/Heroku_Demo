@@ -1,44 +1,98 @@
 class RedditClassifyJob < ActiveJob::Base
   include SuckerPunch::Job
 
-  def perform(new_posts)
+  def perform(new_posts=nil)
     # Do something later
     load_data(new_posts)
   end
 
   private 
   def load_data(new_posts)
-    @b = Classifier::Bayes.new 'Censored', 'Uncensored'
+    @b = {}
+    counts = {}
+    cutoff = {}
     subreddits = RedditPost.pluck(:subreddit).uniq
     # Load all the currently mature data, by title
     # For better results, should take all mature data of a certain time window
     # since this gives us a relative fraction of censored to uncensored data
     subreddits.each do |sr|
-      ar = RedditPost.subreddit(sr).matured.censored
+      @b[sr] = Classifier::Bayes.new 'Censored', 'Uncensored'
+      # Use 1/2 for training, 1/4 for cross-validation, 1/4 for tests
+      counts[sr] = RedditPost.old_order.subreddit(sr).matured.censored.count/2
+      ar = RedditPost.old_order.subreddit(sr).matured.censored.limit(counts[sr])
       # Want at least 10 examples to proceed
       if ar.count < 10
         return false
       end
       ar.each do |item|
-        @b.train_censored item.trim_title
+        @b[sr].train_censored item.trim_title
       end
-      ar = RedditPost.subreddit(sr).matured.uncensored
+      ar = RedditPost.old_order.subreddit(sr).matured.uncensored.limit(counts[sr])
       # Want at least 10 examples to proceed
       if ar.count < 10
         return false
       end
       ar.each do |item|
-        @b.train_uncensored item.trim_title
+        @b[sr].train_uncensored item.trim_title
+      end
+      # Cross validation
+      cv_data = []
+      cv_censored = RedditPost.old_order.subreddit(sr).matured.censored.offset(counts[sr]).limit(counts[sr]/2)
+      cv_uncensored = RedditPost.old_order.subreddit(sr).matured.censored.offset(counts[sr]).limit(counts[sr]/2)
+      cv_censored.each do |item|
+        res = @b[sr].classifications item.trim_title
+        res['is_cen'] = true
+        cv_data << res
+      end
+      cv_uncensored.each do |item|
+        res = @b[sr].classifications item.trim_title
+        res['is_cen'] = false
+        cv_data << res
+      end
+      cutoff[sr] = optimize_cutoff(cv_data)
+    end
+    if false
+      new_posts.each do |item|
+        res = @b[item.subreddit].classifications item.trim_title
+        sum = res.values.reduce(0) {|sum, elem| sum + Math.exp(elem)}
+        res.each do |key, val|
+          res[key] = Math.exp(val)/sum
+        end
+        item.censor_probability = res['Censored']
+        item.save
       end
     end
-    new_posts.each do |item|
-      res = @b.classifications item.trim_title
-      sum = res.values.reduce(0) {|sum, elem| sum + Math.exp(elem)}
-      res.each do |key, val|
-        res[key] = Math.exp(val)/sum
+  end
+
+  def optimize_cutoff(data)
+    # Start with the assumption that there is no bias
+    # We are comparing the log of the relative probabilities
+    # so adding a constant is tantamount for weighting the 
+    # different cases by a factor
+    current = 0
+    # Calculate the F1 score, tp / (tp + fn + fp)
+    # tp will be maximal for some value of 'current'
+    # fp increase as 'current' increases
+    # fn increase as 'current' decreases
+    tp = 0
+    fn = 0
+    fp = 0
+    data.each do |res|
+      if (res['Censored'] + current) > res['Uncensored']
+        if res['is_cen']
+          tp += 1
+        else
+          fp += 1
+        end
+      else
+        if res['is_cen']
+          fn += 1
+          # Else case would measure true negatives, which we don't need here
+        end
       end
-      item.censor_probability = res['Censored']
-      item.save
     end
+    f1 = tp.to_f / (tp + fn + fp)
+    puts "F1 score is #{f1}"
+    return current
   end
 end
