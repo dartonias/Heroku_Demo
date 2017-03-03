@@ -27,6 +27,7 @@ class RedditClassifyJob < ActiveJob::Base
       ar.each do |item|
         @b[sr].train_censored item.trim_title
       end
+
       ar = RedditPost.old_order.subreddit(sr).matured.uncensored.limit(counts[sr])
       # Want at least 10 examples to proceed
       if ar.count < 10
@@ -37,8 +38,8 @@ class RedditClassifyJob < ActiveJob::Base
       end
       # Cross validation
       cv_data = []
-      cv_censored = RedditPost.old_order.subreddit(sr).matured.censored.offset(counts[sr]).limit(counts[sr]/2)
-      cv_uncensored = RedditPost.old_order.subreddit(sr).matured.censored.offset(counts[sr]).limit(counts[sr]/2)
+      cv_censored =   RedditPost.old_order.subreddit(sr).matured.  censored.offset(counts[sr]).limit(counts[sr]/2)
+      cv_uncensored = RedditPost.old_order.subreddit(sr).matured.uncensored.offset(counts[sr]).limit(counts[sr]/2)
       cv_censored.each do |item|
         res = @b[sr].classifications item.trim_title
         res['is_cen'] = true
@@ -70,29 +71,40 @@ class RedditClassifyJob < ActiveJob::Base
     # so adding a constant is tantamount for weighting the 
     # different cases by a factor
     current = 0
-    # Calculate the F1 score, tp / (tp + fn + fp)
+    # Calculate the Cohen's_kappa, tp / (tp + fn + fp)
     # tp will be maximal for some value of 'current'
     # fp increase as 'current' increases
     # fn increase as 'current' decreases
     tp = 0
     fn = 0
     fp = 0
+    tn = 0
+    num_cen = 0
+    total = 0
     data.each do |res|
+      total += 1
       if (res['Censored'] + current) > res['Uncensored']
         if res['is_cen']
           tp += 1
+          num_cen += 1
         else
           fp += 1
         end
       else
         if res['is_cen']
           fn += 1
-          # Else case would measure true negatives, which we don't need here
+          num_cen += 1
+        else
+          tn += 1
         end
       end
     end
-    f1 = tp.to_f / (tp + fn + fp)
-    puts "F1 score is #{f1}"
+    po = (tp + tn)/total.to_f
+    pe = ((tp + fp)*(tp + fn) + (tn + fp)*(tn + fn))/(total.to_f ** 2)
+    ck = (po - pe)/(1.0 - pe)
+    puts "Cohen's kappa score is #{ck}"
+    puts "tp: #{tp}, fp: #{fp}, tn: #{tn}, fn: #{fn}"
+    puts "total: #{total}, num_cen: #{num_cen}"
     return current
   end
 end

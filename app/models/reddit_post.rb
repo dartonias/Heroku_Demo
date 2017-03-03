@@ -36,7 +36,7 @@ class RedditPost < ActiveRecord::Base
           new_posts << RedditPost.create(data)
         end
         # Could run this asynchronously too, but this block is only run from asynchronous rake tasks already
-        RedditClassifyJob.new.perform(new_posts)
+        # RedditClassifyJob.new.perform(new_posts)
       end
     end
   end
