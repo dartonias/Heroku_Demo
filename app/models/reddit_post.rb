@@ -5,16 +5,18 @@ class RedditPost < ActiveRecord::Base
   scope :uncensored, -> { where(censored: false) }
   scope :subreddit, ->(sr) { where(subreddit: sr) }
   
-  def self.matured
+  def self.aged
     old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
     oldest = (DateTime.now - old_limit).to_i
     where("created_utc < ?", oldest)
   end
 
-  def self.fresh
-    old_limit = (ENV['OLD_TIME_HOURS'] || 24).to_i.hours
-    oldest = (DateTime.now - old_limit).to_i
-    where("created_utc >= ?", oldest)
+  def self.only_matured
+    where(fresh: false)
+  end
+
+  def self.only_fresh
+    where(fresh: true)
   end
 
   # Do processing here for Bayesian machine learning censorship
@@ -111,10 +113,10 @@ class RedditPost < ActiveRecord::Base
     srs = RedditPost.distinct.pluck(:subreddit)
     srs.each do |sr|
       offset = 0
-      num = RedditPost.old_order.uncensored.subreddit(sr).matured.offset(offset).limit(batch_size).count
+      num = RedditPost.old_order.uncensored.subreddit(sr).only_fresh.aged.offset(offset).limit(batch_size).count
       puts "num: #{num}" if debug
       while num > 0 do
-        ids = RedditPost.old_order.uncensored.subreddit(sr).matured.offset(offset).limit(batch_size).pluck(:reddit_id)
+        ids = RedditPost.old_order.uncensored.subreddit(sr).only_fresh.aged.offset(offset).limit(batch_size).pluck(:reddit_id)
         puts "sr: #{sr}, ids: #{ids}" if debug
         # Process here
         search_result = RedditQuery.search_many(sr,ids)
@@ -124,11 +126,17 @@ class RedditPost < ActiveRecord::Base
             puts "data: #{data}" if debug
             # We'll double check that it was in our initial list
             ids.delete(data["reddit_id"])
+            post = RedditPost.uncensored.subreddit(sr).where(reddit_id: data["reddit_id"]).first
+            if post then
+              post.fresh = false
+              post.save
+            end
           end
           # Ones that were not found must have been censored
           ids.each do |cen_id|
             post = RedditPost.uncensored.subreddit(sr).where(reddit_id: cen_id).first
             post.censored = true
+            post.fresh = false
             post.save
           end
         else
@@ -137,7 +145,7 @@ class RedditPost < ActiveRecord::Base
         end
         # End while logic
         offset += batch_size
-        num = RedditPost.old_order.uncensored.matured.offset(offset).limit(batch_size).count
+        num = RedditPost.old_order.uncensored.only_fresh.aged.offset(offset).limit(batch_size).count
       end
     end
   end

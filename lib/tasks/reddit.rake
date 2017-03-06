@@ -20,9 +20,9 @@ namespace :reddit do
     srs = RedditPost.distinct.pluck(:subreddit)
     srs.each do |sr|
       # Only keep the most recent 500 uncensored per subreddit that were uncensored after the check
-      RedditPost.new_order.subreddit(sr).uncensored.matured.offset(500).destroy_all
+      RedditPost.new_order.subreddit(sr).uncensored.only_matured.offset(500).destroy_all
       # Only keep the most recent 500 censored per subreddit, which must be after the check by definition
-      RedditPost.new_order.subreddit(sr).censored.offset(500).destroy_all
+      RedditPost.new_order.subreddit(sr).censored.only_matured.offset(500).destroy_all
     end
   end
 end

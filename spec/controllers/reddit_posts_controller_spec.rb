@@ -7,7 +7,8 @@ post_data = {reddit_id: 'zzz123',
   subreddit: 'some_sub',
   created_utc: oldest,
   title: 'Unoriginal title number 5',
-  url: 'someurl.com/somearticle'}
+  url: 'someurl.com/somearticle',
+  fresh: false}
 
 # Should be even for simplicity
 post_size = 20
