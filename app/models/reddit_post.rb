@@ -22,6 +22,17 @@ class RedditPost < ActiveRecord::Base
     self.title.downcase.gsub(/[^0-9a-z ]/i, '')
   end
 
+  def domain
+    url = self.url.split()[0]
+    uri = URI.parse(URI.encode(url.strip))
+    begin
+      domain = PublicSuffix.parse(uri.host)
+      domain.domain
+    rescue PublicSuffix::DomainNotAllowed
+      return ''
+    end
+  end
+
   # Look through the json data and
   # add any new entries to the database to watch
   # usage

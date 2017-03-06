@@ -1,0 +1,39 @@
+Maximum entropy
+
+Raw data (x_i, y_i)
+x_i - phrases
+y_i - category / labels
+
+~functions - those depending on the sample data directly
+
+~p(x,y) = 1/N * number of (x,y) in sample
+
+f(x,y) a feature
+1 if feature satisfied
+0 otherwise
+~p(f) = \sum_{x,y} ~p(x,y)f(x,y)
+
+Important features, require
+p(f) = \sum_{x,y} ~p(x)p(y|x)f(x,y)
+
+This constraint affects p(y|x)
+
+Maximize entropy defined by
+H(p) = -\sum_{x,y} ~p(x)p(y|x)log(p(y|x))
+
+Find p* = argmax_{p \in C} H(p)
+
+[Lagrange multipliers, dual problem]
+
+Find \lambda* that maximizes \Psi(\lambda)
+
+algorithm for updating lambdas:
+  \Delta \lambda_i defined by
+    \sum_{x,y} ~p(x)p(y|x)f_i(x,y) exp(\Delta \lambda_i f#(x,y)) = ~p(f_i)
+    [f#(x,y) = \sum_i f_i(x,y)]
+  \lambda_i += \Delta \lmabda_i
+end
+
+if f# is constant for all (x,y) (mutually exclusive categories that span)
+then can rewrite as
+\Delta \lambda_i = 1/M log(~p(f_i)/p_\lambda(f_i))
