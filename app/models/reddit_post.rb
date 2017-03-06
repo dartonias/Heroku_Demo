@@ -111,7 +111,8 @@ class RedditPost < ActiveRecord::Base
     puts "Batch size: #{batch_size}" if debug
     # Array of distinct subreddits
     srs = RedditPost.distinct.pluck(:subreddit)
-    srs.each do |sr|
+    # Randomize the order so reddit failures don't cause any problems
+    srs.sample(srs.count).each do |sr|
       offset = 0
       num = RedditPost.old_order.uncensored.subreddit(sr).only_fresh.aged.offset(offset).limit(batch_size).count
       puts "num: #{num}" if debug
