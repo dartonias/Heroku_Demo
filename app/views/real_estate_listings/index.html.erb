@@ -1,0 +1,40 @@
+<div class="container">
+<div class="row">
+<div class="col-sm-12">
+
+<h1>Real Estate Listings</h1>
+
+<p>
+lorem ipsum lorem ipsum
+</p>
+  
+<%= form_tag realestate_path, :method => 'get' do %>
+    <%= text_field_tag :search, params[:search] %>
+    <%= label :search, 'Address Search' %>
+</p>
+    <%= text_field_tag :regexp, params[:regexp] %>
+    <%= label :search, 'Address Regular Expression' %>
+</p>
+    <%= text_field_tag :minprice, params[:minprice] %>
+    <%= label :minprice, 'Minimum Price' %>
+</p>
+    <%= text_field_tag :maxprice, params[:maxprice] %>
+    <%= label :maxprice, 'Maximum Price' %>
+</p>
+    <%= submit_tag "Filter", :name => nil %>
+    <%= button_tag "Reset", type: :reset %>
+<% end %>
+  
+<h2>Recent Listings</h2>
+<table class="table table-striped">
+<tr>
+<th>Address</th>
+<th>Square ft</th>
+<th>Price</th>
+</tr>
+<%= render partial: "listing", collection: @listings %>
+</table>
+
+</div>
+</div>
+</div>

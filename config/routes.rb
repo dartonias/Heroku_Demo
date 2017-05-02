@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   root 'welcome#index'
   get 'reddit' => 'reddit_posts#index'
   get 'sudoku' => 'sudoku_puzzles#index'
+  get 'realestate' => 'real_estate_listings#index'
   post 'sudoku' => 'sudoku_puzzles#create'
 
   # Example of regular route:
