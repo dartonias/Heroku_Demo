@@ -15,8 +15,8 @@ conn = psycopg2.connect(
 )
 
 with conn.cursor() as cur:
-  #cur.execute("SELECT * FROM remax_listings;")
-  cur.execute("SELECT * FROM pg_catalog.pg_tables;")
+  cur.execute("SELECT * FROM public.remax_listings;")
+  #cur.execute("SELECT * FROM pg_catalog.pg_tables;")
   results = cur.fetchall()
   for r in results:
     print(r)
