@@ -14,6 +14,13 @@ conn = psycopg2.connect(
     port=url.port
 )
 
+with conn.cursor() as cur:
+  cur.execute("SELECT * FROM remax_listings;")
+  results = cur.fetchall()
+  for r in results:
+    print(r)
+    break
+
 hello = tf.constant('Hello, TensorFlow!')
 
 with tf.Session() as sess:
