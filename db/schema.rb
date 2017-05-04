@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170320184344) do
+ActiveRecord::Schema.define(version: 20170504182126) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,9 +39,12 @@ ActiveRecord::Schema.define(version: 20170320184344) do
     t.integer  "square"
     t.boolean  "extra_bed"
     t.boolean  "extra_bath"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
     t.string   "url"
+    t.decimal  "longitude"
+    t.decimal  "latitude"
+    t.integer  "predicted_price"
   end
 
   create_table "sudoku_puzzles", force: :cascade do |t|

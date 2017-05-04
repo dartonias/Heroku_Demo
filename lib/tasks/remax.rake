@@ -4,7 +4,7 @@ namespace :remax do
   task fetch_new: :environment do
     RemaxListing.add_new_listings
     RemaxListing.cleanup
-    RemaxListing.new_order.offset(1000).destroy_all
+    RemaxListing.new_order.offset(4000).destroy_all
   end
   
 end

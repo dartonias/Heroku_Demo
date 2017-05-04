@@ -14,13 +14,16 @@ conn = psycopg2.connect(
     port=url.port
 )
 
-with conn.cursor() as cur:
-  #cur.execute("SELECT * FROM information_schema.tables ;")
-  #cur.execute("SELECT * FROM pg_catalog.pg_tables;")
-  cur.execute("SELECT * FROM public.remax_listings")
-  results = cur.fetchall()
-  for r in results:
-    print(r)
+find_cur = conn.cursor()
+#cur.execute("SELECT * FROM information_schema.tables ;")
+#cur.execute("SELECT * FROM pg_catalog.pg_tables;")
+find_cur.execute("SELECT id,name,address,longitude FROM public.remax_listings")
+results = find_cur.fetchall()
+find_cur.close()
+conn.commit()
+for r in results:
+  print(r)
+conn.close()    
 
 hello = tf.constant('Hello, TensorFlow!')
 
