@@ -43,7 +43,7 @@ def main():
       port=url.port
   )
   find_cur = conn.cursor()
-  find_cur.execute("SELECT id,name,address,longitude FROM public.remax_listings WHERE longitude IS NULL LIMIT 5;")
+  find_cur.execute("SELECT id,name,address,longitude FROM public.remax_listings WHERE longitude IS NULL;")
   results = find_cur.fetchall()
   find_cur.close()
   conn.commit()
