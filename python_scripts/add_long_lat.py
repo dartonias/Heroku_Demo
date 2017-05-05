@@ -21,7 +21,7 @@ def get_loc(geolocator):
       # For KW Region, expect something around -80, 43
       # Wait time for API service
       sleep(0.02)
-      location = geolocator.geocode(data.loc[i,'name'] + ", " + data.loc[i,'address'][:-9] + ", Canada")
+      location = geolocator.geocode(name + ", " + address[:-9] + ", Canada")
       if location is None:
         # Lookup failed, don't bother trying again
         return FILTER_LOC, FILTER_LOC
