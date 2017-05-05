@@ -54,7 +54,7 @@ def main():
     if r[3] is None:
       loc = geo(r[1],r[2])
       # Update the entries
-      update_cur.execute("UPDATE public.remax_listings SET longitude=(%s), latitude=(%s) WHERE id=(%s);",(loc[],loc[],r[0]))
+      update_cur.execute("UPDATE public.remax_listings SET longitude=(%s), latitude=(%s) WHERE id=(%s);",(loc[1],loc[0],r[0]))
       #print("UPDATE public.remax_listings SET longitude={}, latitude={} WHERE id={};".format(loc[1],loc[0],r[0]))
   update_cur.close()
   conn.commit()
