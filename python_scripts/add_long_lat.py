@@ -7,6 +7,7 @@ from geopy.exc import GeocoderTimedOut
 import psycopg2
 import urllib.parse
 import os
+from time import sleep
 
 # Filter value for cases where the lookup server responded but the particular query failed
 # Since 999 is never a valid latitude or longitude, this should be fine
