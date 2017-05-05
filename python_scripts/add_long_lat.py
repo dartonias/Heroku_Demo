@@ -44,7 +44,7 @@ def main():
   find_cur = conn.cursor()
   find_cur.execute("SELECT id,name,address,longitude FROM public.remax_listings WHERE longitude IS NULL LIMIT 5;")
   results = find_cur.fetchall()
-  find_cut.close()
+  find_cur.close()
   conn.commit()
   geo = get_loc(GoogleV3(os.environ["GOOGLE_V3_API_KEY"]))
   #update_cur = conn.cursor()
@@ -56,7 +56,7 @@ def main():
       #update_cur.execute("UPDATE public.remax_listings SET longitude=(%s), latitude=(%s) WHERE id=(%s);",(loc[],loc[],r[0]))
       print("UPDATE public.remax_listings SET longitude={}, latitude={} WHERE id={};".format(loc[1],loc[0],r[0]))
       break
-  #update_cut.close()
+  #update_cur.close()
   conn.commit()
   conn.close()   
 
