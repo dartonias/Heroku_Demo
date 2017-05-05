@@ -48,16 +48,15 @@ def main():
   find_cur.close()
   conn.commit()
   geo = get_loc(GoogleV3(os.environ["GOOGLE_V3_API_KEY"]))
-  #update_cur = conn.cursor()
+  update_cur = conn.cursor()
   for r in results:
     # Using the name and address, look up
     if r[3] is None:
       loc = geo(r[1],r[2])
       # Update the entries
-      #update_cur.execute("UPDATE public.remax_listings SET longitude=(%s), latitude=(%s) WHERE id=(%s);",(loc[],loc[],r[0]))
-      print("UPDATE public.remax_listings SET longitude={}, latitude={} WHERE id={};".format(loc[1],loc[0],r[0]))
-      break
-  #update_cur.close()
+      update_cur.execute("UPDATE public.remax_listings SET longitude=(%s), latitude=(%s) WHERE id=(%s);",(loc[],loc[],r[0]))
+      #print("UPDATE public.remax_listings SET longitude={}, latitude={} WHERE id={};".format(loc[1],loc[0],r[0]))
+  update_cur.close()
   conn.commit()
   conn.close()   
 
