@@ -13,7 +13,7 @@ FILTER_LOC = 999
 
 def get_loc(geolocator):
   def f(name, address):
-    if name is None or address is None
+    if name is None or address is None:
       return None, None
     try:
       # For KW Region, expect something around -80, 43
