@@ -42,26 +42,26 @@ def format_data(data):
   norms = {}
   tf_data = {}
   data.iloc[:,DESCRIPTION] = (data.iloc[:,DESCRIPTION].apply(make_numerical(HOUSE_KEYS))).astype(int)
-  tf_data['description'] = tf.one_hot(data.iloc[:,DESCRIPTION], len(HOUSE_KEYS), dtype=tf.float32)
+  tf_data['description'] = tf.one_hot(data.iloc[:,DESCRIPTION].values, len(HOUSE_KEYS), dtype=tf.float32)
   data.iloc[:,EXTRA_BED] = (data.iloc[:,EXTRA_BED].apply(lambda x: "t" in x)).astype(int)
   data.iloc[:,EXTRA_BATH] = (data.iloc[:,EXTRA_BATH].apply(lambda x: "t" in x)).astype(int)
-  tf_data['extra_bed'] = tf.reshape(tf.constant(data.iloc[:,EXTRA_BED], dtype=tf.float32),[-1,1])
-  tf_data['extra_bath'] = tf.reshape(tf.constant(data.iloc[:,EXTRA_BATH], dtype=tf.float32),[-1,1])
+  tf_data['extra_bed'] = tf.reshape(tf.constant(data.iloc[:,EXTRA_BED].values, dtype=tf.float32),[-1,1])
+  tf_data['extra_bath'] = tf.reshape(tf.constant(data.iloc[:,EXTRA_BATH].values, dtype=tf.float32),[-1,1])
   norms['square_mean'] = data.iloc[:,SQUARE].mean()
   norms['square_std'] = data.iloc[:,SQUARE].std()
   data.iloc[:,SQUARE] = (data.iloc[:,SQUARE] - norms['square_mean'])/norms['square_std']
-  tf_data['square'] = tf.reshape(tf.constant(data.iloc[:,SQUARE], dtype=tf.float32),[-1,1])
-  tf_data['beds'] = tf.reshape(tf.constant(data.iloc[:,BEDS], dtype=tf.float32),[-1,1])
-  tf_data['baths'] = tf.reshape(tf.constant(data.iloc[:,BATHS], dtype=tf.float32),[-1,1])
-  tf_data['rooms'] = tf.reshape(tf.constant(data.iloc[:,ROOMS], dtype=tf.float32),[-1,1])
+  tf_data['square'] = tf.reshape(tf.constant(data.iloc[:,SQUARE].values, dtype=tf.float32),[-1,1])
+  tf_data['beds'] = tf.reshape(tf.constant(data.iloc[:,BEDS].values, dtype=tf.float32),[-1,1])
+  tf_data['baths'] = tf.reshape(tf.constant(data.iloc[:,BATHS].values, dtype=tf.float32),[-1,1])
+  tf_data['rooms'] = tf.reshape(tf.constant(data.iloc[:,ROOMS].values, dtype=tf.float32),[-1,1])
   norms['longitude_mean'] = data.iloc[:,LONGITUDE].mean()
   norms['longitude_std'] = data.iloc[:,LONGITUDE].std()
   norms['latitude_mean'] = data.iloc[:,LATITUDE].mean()
   norms['latitude_std'] = data.iloc[:,LATITUDE].std()
   data.iloc[:,LONGITUDE] = (data.iloc[:,LONGITUDE] - norms['longitude_mean'])/norms['longitude_std']
   data.iloc[:,LATITUDE] = (data.iloc[:,LATITUDE] - norms['latitude_mean'])/norms['latitude_std']
-  tf_data['longitude'] = tf.reshape(tf.constant(data.iloc[:,LONGITUDE], dtype=tf.float32),[-1,1])
-  tf_data['latitude'] = tf.reshape(tf.constant(data.iloc[:,LATITUDE], dtype=tf.float32),[-1,1])
+  tf_data['longitude'] = tf.reshape(tf.constant(data.iloc[:,LONGITUDE].values, dtype=tf.float32),[-1,1])
+  tf_data['latitude'] = tf.reshape(tf.constant(data.iloc[:,LATITUDE].values, dtype=tf.float32),[-1,1])
   # Format the data
   keys = sorted(tf_data.keys())
   data_input = tf.concat([tf_data[i] for i in keys], 1)
@@ -70,7 +70,7 @@ def format_data(data):
   norms['price_mean'] = data.iloc[:,PRICE].mean()
   norms['price_std'] = data.iloc[:,PRICE].std()
   data.iloc[:,PRICE] = (data.iloc[:,PRICE] - norms['price_mean'])/norms['price_std']
-  data_output = tf.reshape(tf.constant(data.iloc[:,PRICE], dtype=tf.float32),[-1,1])
+  data_output = tf.reshape(tf.constant(data.iloc[:,PRICE].values, dtype=tf.float32),[-1,1])
   return data_input, data_output, norms
 
 def main():
