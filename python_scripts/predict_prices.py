@@ -11,7 +11,7 @@ from time import sleep
 import sys
 
 import tensorflow as tf
-import numpy as np
+import pandas as pd
 
 HOUSE_KEYS = ["House", "Detached", "Att/Row/Twnhouse", "Duplex", "Apartment", "Single Family", "Townhouses", "Multi-Family", "Triplex", "Condominiums", "Condo Townhouse", "Condo Apt"]
 FILTER_LOC = 999
@@ -38,11 +38,14 @@ def format_data(data):
   EXTRA_BATH = 10
   LONGITUDE = 11
   LATITUDE = 12
-  data = np.array(data)
+  data = pd.DataFrame(data)
+  print(data)
+  print(data.iloc[:,DESCRIPTION])
+  sys.exit()
   norms = {}
   tf_data = {}
-  vec_make_numerical = np.vectorize(make_numerical(HOUSE_KEYS))
-  data[:,DESCRIPTION] = vec_make_numerical(data[:,DESCRIPTION])
+  #vec_make_numerical = np.vectorize(make_numerical(HOUSE_KEYS))
+  #data[:,DESCRIPTION] = vec_make_numerical(data[:,DESCRIPTION])
   print(data[:,DESCRIPTION])
   tf_data['description'] = tf.one_hot(data[:,DESCRIPTION], len(HOUSE_KEYS), dtype=tf.float32)
   tf_data['extra_bed'] = tf.reshape(tf.constant(data[:,EXTRA_BED], dtype=tf.float32),[-1,1])
