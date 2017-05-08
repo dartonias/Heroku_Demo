@@ -34,7 +34,7 @@ def format_data(data):
   data = np.array(data)
   norms = {}
   tf_data = {}
-  tf_data['description'] = tf.one_hot(tf.constant(data[:,DESCRIPTION], len(HOUSE_KEYS), dtype=tf.float32))
+  tf_data['description'] = tf.one_hot(data[:,DESCRIPTION], len(HOUSE_KEYS), dtype=tf.float32)
   tf_data['extra_bed'] = tf.reshape(tf.constant(data[:,EXTRA_BED], dtype=tf.float32),[-1,1])
   tf_data['extra_bath'] = tf.reshape(tf.constant(data[:,EXTRA_BATH], dtype=tf.float32),[-1,1])
   norms['square_mean'] = data[:,SQUARE].mean()
