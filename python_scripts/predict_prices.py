@@ -32,8 +32,6 @@ def format_data(data):
   LONGITUDE = 11
   LATITUDE = 12
   data = np.array(data)
-  print(data)
-  sys.exit()
   norms = {}
   tf_data = {}
   tf_data['description'] = tf.one_hot(tf.constant(data[:,DESCRIPTION], len(HOUSE_KEYS), dtype=tf.float32))
@@ -75,7 +73,7 @@ def main():
       port=url.port
   )
   find_cur = conn.cursor()
-  find_cur.execute("SELECT id,description,name,address,price,beds,baths,rooms,square,extra_bed,extra_bath,longitude,latitude FROM public.remax_listings WHERE longitude IS NULL;")
+  find_cur.execute("SELECT id,description,name,address,price,beds,baths,rooms,square,extra_bed,extra_bath,longitude,latitude FROM public.remax_listings;")
   results = find_cur.fetchall()
   find_cur.close()
   conn.commit()
