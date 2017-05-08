@@ -43,8 +43,8 @@ def format_data(data):
   tf_data = {}
   data.iloc[:,DESCRIPTION] = (data.iloc[:,DESCRIPTION].apply(make_numerical(HOUSE_KEYS))).astype(int)
   tf_data['description'] = tf.one_hot(data.iloc[:,DESCRIPTION].values, len(HOUSE_KEYS), dtype=tf.float32)
-  data.iloc[:,EXTRA_BED] = (data.iloc[:,EXTRA_BED].apply(lambda x: "t" in x)).astype(int)
-  data.iloc[:,EXTRA_BATH] = (data.iloc[:,EXTRA_BATH].apply(lambda x: "t" in x)).astype(int)
+  data.iloc[:,EXTRA_BED] = (data.iloc[:,EXTRA_BED]).astype(int)
+  data.iloc[:,EXTRA_BATH] = (data.iloc[:,EXTRA_BATH]).astype(int)
   tf_data['extra_bed'] = tf.reshape(tf.constant(data.iloc[:,EXTRA_BED].values, dtype=tf.float32),[-1,1])
   tf_data['extra_bath'] = tf.reshape(tf.constant(data.iloc[:,EXTRA_BATH].values, dtype=tf.float32),[-1,1])
   norms['square_mean'] = data.iloc[:,SQUARE].mean()
