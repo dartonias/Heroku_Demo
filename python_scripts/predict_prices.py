@@ -16,6 +16,13 @@ import numpy as np
 HOUSE_KEYS = ["House", "Detached", "Att/Row/Twnhouse", "Duplex", "Apartment", "Single Family", "Townhouses", "Multi-Family", "Triplex", "Condominiums", "Condo Townhouse", "Condo Apt"]
 FILTER_LOC = 999
 
+def make_numerical(names):
+  def f(col):
+    if col in names:
+      return names.index(col)
+    return -1
+  return f
+
 def format_data(data):
   # Values held in the rows
   ID = 0
@@ -34,6 +41,9 @@ def format_data(data):
   data = np.array(data)
   norms = {}
   tf_data = {}
+  vec_make_numerical = np.vectorize(make_numerical(HOUSE_KEYS))
+  data[:,DESCRIPTION] = vec_make_numerical(data[:,DESCRIPTION])
+  print(data[:,DESCRIPTION])
   tf_data['description'] = tf.one_hot(data[:,DESCRIPTION], len(HOUSE_KEYS), dtype=tf.float32)
   tf_data['extra_bed'] = tf.reshape(tf.constant(data[:,EXTRA_BED], dtype=tf.float32),[-1,1])
   tf_data['extra_bath'] = tf.reshape(tf.constant(data[:,EXTRA_BATH], dtype=tf.float32),[-1,1])
