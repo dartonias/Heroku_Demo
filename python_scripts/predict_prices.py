@@ -8,6 +8,7 @@ import psycopg2
 import urllib.parse
 import os
 from time import sleep
+import sys
 
 import tensorflow as tf
 import numpy as np
@@ -31,6 +32,8 @@ def format_data(data):
   LONGITUDE = 11
   LATITUDE = 12
   data = np.array(data)
+  print(data)
+  sys.exit()
   norms = {}
   tf_data = {}
   tf_data['description'] = tf.one_hot(tf.constant(data[:,DESCRIPTION], len(HOUSE_KEYS), dtype=tf.float32))
