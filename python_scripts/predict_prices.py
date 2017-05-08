@@ -92,10 +92,7 @@ def main():
   conn.commit()
   # Machine learn on the variables, and write back to database
   x, _y, norms = format_data(results)
-  num_input = x.shape[1]
-  print(num_input)
-  print(int(num_input))
-  sys.exit()
+  num_input = int(x.shape[1])
   layers = [num_input*2, num_input*1]
   W = []
   b = []
