@@ -91,7 +91,7 @@ def main():
   find_cur.close()
   conn.commit()
   # Machine learn on the variables, and write back to database
-  x, _y, norms = format_data(results)
+  x, _y, rn = format_data(results)
   num_input = int(x.shape[1])
   layers = [num_input*2, num_input*1]
   W = []
