@@ -54,6 +54,8 @@ def format_data(data):
   tf_data['beds'] = tf.reshape(tf.constant(data.iloc[:,BEDS].values, dtype=tf.float32),[-1,1])
   tf_data['baths'] = tf.reshape(tf.constant(data.iloc[:,BATHS].values, dtype=tf.float32),[-1,1])
   tf_data['rooms'] = tf.reshape(tf.constant(data.iloc[:,ROOMS].values, dtype=tf.float32),[-1,1])
+  data.iloc[:,LONGITUDE] = (data.iloc[:,LONGITUDE]).astype(float)
+  data.iloc[:,LATITUDE] = (data.iloc[:,LATITUDE]).astype(float)
   norms['longitude_mean'] = data.iloc[:,LONGITUDE].mean()
   norms['longitude_std'] = data.iloc[:,LONGITUDE].std()
   norms['latitude_mean'] = data.iloc[:,LATITUDE].mean()
