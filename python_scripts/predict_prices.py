@@ -128,13 +128,10 @@ def main():
   train_step = tf.train.GradientDescentOptimizer(0.002).minimize(cost)
   train_step2 = tf.train.GradientDescentOptimizer(0.002).minimize(cost2)
   init_op = tf.global_variables_initializer()
-  train_time = 60
+  # Training time in seconds, training will run for at least this long
+  train_time = 600
   with tf.Session() as sess:
     sess.run(init_op)
-    print("X is")
-    print(x.eval())
-    print("_Y is")
-    print(_y.eval())
     # Normal error loop
     initial_time = time()
     current_time = time()
@@ -161,7 +158,7 @@ def main():
     #print(y[-1].eval())
     #print("_Y is")
     #print(_y.eval())
-    predicted_prices = tf.reshape(y[-1],[-1]).eval().tolist()
+    predicted_prices = tf.reshape(y[-1]*rn['price_std']+rn['price_mean'],[-1]).eval().tolist()
   # Update the entries with predicted prices
   print("ids = ")
   print(ids)
