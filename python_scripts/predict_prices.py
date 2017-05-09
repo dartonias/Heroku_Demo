@@ -142,7 +142,7 @@ def main():
       if count % 1000 == 0:
         current_time = time()
         print("Elapsed time: {}".format(current_time - initial_time))
-    predicted_prices = y.eval()
+    predicted_prices = y[-1].eval()
   # Update the entries with predicted prices
   print(predicted_prices)
   #update_cur = conn.cursor()
