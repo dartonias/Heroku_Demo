@@ -76,9 +76,6 @@ def format_data(data):
   norms['price_std'] = data.iloc[:,PRICE].std()
   data.iloc[:,PRICE] = (data.iloc[:,PRICE] - norms['price_mean'])/norms['price_std']
   data_output = tf.reshape(tf.constant(data.iloc[:,PRICE].values, dtype=tf.float32),[-1,1])
-  print(data)
-  print(data.iloc[:,PRICE].values)
-  sys.exit()
   return data_input, data_output, norms, ids
 
 def main():
@@ -124,7 +121,9 @@ def main():
   train_time = 60
   with tf.Session() as sess:
     sess.run(init_op)
+    print("X is")
     print(x.eval())
+    print("Y is")
     print(_y.eval())
     sys.exit()
     # Normal error loop
