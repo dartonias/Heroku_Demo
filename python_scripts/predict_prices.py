@@ -51,7 +51,7 @@ def format_data(data):
   # End pruning
   norms = {}
   tf_data = {}
-  ids = data.iloc[:,ID].values
+  ids = data.iloc[:,ID].values.flatten().tolist()
   data.iloc[:,DESCRIPTION] = (data.iloc[:,DESCRIPTION].apply(make_numerical(HOUSE_KEYS))).astype(int)
   tf_data['description'] = tf.one_hot(data.iloc[:,DESCRIPTION].values, len(HOUSE_KEYS), dtype=tf.float32)
   data.iloc[:,EXTRA_BED] = (data.iloc[:,EXTRA_BED]).astype(int)
@@ -161,7 +161,7 @@ def main():
     #print(y[-1].eval())
     #print("_Y is")
     #print(_y.eval())
-    predicted_prices = y[-1].eval()
+    predicted_prices = tf.reshape(y[-1],[-1]).eval().tolist()
   # Update the entries with predicted prices
   print("ids = ")
   print(ids)
