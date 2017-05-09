@@ -123,9 +123,8 @@ def main():
     sess.run(init_op)
     print("X is")
     print(x.eval())
-    print("Y is")
+    print("_Y is")
     print(_y.eval())
-    sys.exit()
     # Normal error loop
     initial_time = time()
     current_time = time()
@@ -136,6 +135,7 @@ def main():
       if count % 10000 == 0:
         current_time = time()
         print("Elapsed time: {}".format(current_time - initial_time))
+        print("Cost: {}".format(cost.eval()))
     # Log error loop
     initial_time = time()
     current_time = time()
@@ -146,7 +146,12 @@ def main():
       if count % 10000 == 0:
         current_time = time()
         print("Elapsed time: {}".format(current_time - initial_time))
-    predicted_prices = y[-1].eval()
+        print("Cost2: {}".format(cost2.eval()))
+    print("Y is")
+    print(y[-1].eval())
+    print("_Y is")
+    print(_y.eval())
+    #predicted_prices = y[-1].eval()
   # Update the entries with predicted prices
   #update_cur = conn.cursor()
   #update_cur.close()
