@@ -71,12 +71,14 @@ def format_data(data):
   # Format the data
   keys = sorted(tf_data.keys())
   data_input = tf.concat([tf_data[i] for i in keys], 1)
-  print(data_input)
   # Format the target
   norms['price_mean'] = data.iloc[:,PRICE].mean()
   norms['price_std'] = data.iloc[:,PRICE].std()
   data.iloc[:,PRICE] = (data.iloc[:,PRICE] - norms['price_mean'])/norms['price_std']
   data_output = tf.reshape(tf.constant(data.iloc[:,PRICE].values, dtype=tf.float32),[-1,1])
+  print(data)
+  print(data.iloc[:,PRICE].value)
+  sys.exit()
   return data_input, data_output, norms, ids
 
 def main():
@@ -96,9 +98,6 @@ def main():
   conn.commit()
   # Machine learn on the variables, and write back to database
   x, _y, rn, ids = format_data(results)
-  print(x)
-  print(_y)
-  sys.exit()
   num_input = int(x.shape[1])
   layers = [num_input*2, num_input*1]
   W = []
