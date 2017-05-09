@@ -96,6 +96,9 @@ def main():
   conn.commit()
   # Machine learn on the variables, and write back to database
   x, _y, rn, ids = format_data(results)
+  print(x)
+  print(_y)
+  sys.exit()
   num_input = int(x.shape[1])
   layers = [num_input*2, num_input*1]
   W = []
@@ -143,10 +146,7 @@ def main():
         current_time = time()
         print("Elapsed time: {}".format(current_time - initial_time))
     predicted_prices = y[-1].eval()
-    print(_y)
-    print(predicted_prices)
   # Update the entries with predicted prices
-  print(predicted_prices)
   #update_cur = conn.cursor()
   #update_cur.close()
   #conn.commit()
