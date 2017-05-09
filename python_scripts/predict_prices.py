@@ -122,6 +122,7 @@ def main():
   train_time = 60
   with tf.Session() as sess:
     sess.run(init_op)
+    # Normal error loop
     initial_time = time()
     current_time = time()
     count = 0
@@ -130,7 +131,9 @@ def main():
       count += 1
       if count % 1000 == 0:
         current_time = time()
-        initial_time = time()
+        print("Elapsed time: {}".format(current_time - initial_time))
+    # Log error loop
+    initial_time = time()
     current_time = time()
     count = 0
     while (current_time - initial_time) < train_time:
@@ -138,6 +141,7 @@ def main():
       count += 1
       if count % 1000 == 0:
         current_time = time()
+        print("Elapsed time: {}".format(current_time - initial_time))
     predicted_prices = y.eval()
   # Update the entries with predicted prices
   print(predicted_prices)
