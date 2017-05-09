@@ -137,16 +137,16 @@ def main():
         print("Elapsed time: {}".format(current_time - initial_time))
         print("Cost: {}".format(cost.eval()))
     # Log error loop
-    initial_time = time()
-    current_time = time()
-    count = 0
-    while (current_time - initial_time) < train_time:
-      sess.run(train_step2)
-      count += 1
-      if count % 10000 == 0:
-        current_time = time()
-        print("Elapsed time: {}".format(current_time - initial_time))
-        print("Cost2: {}".format(cost2.eval()))
+    #initial_time = time()
+    #current_time = time()
+    #count = 0
+    #while (current_time - initial_time) < train_time:
+    #  sess.run(train_step2)
+    #  count += 1
+    #  if count % 10000 == 0:
+    #    current_time = time()
+    #    print("Elapsed time: {}".format(current_time - initial_time))
+    #    print("Cost2: {}".format(cost2.eval()))
     print("Y is")
     print(y[-1].eval())
     print("_Y is")
