@@ -129,7 +129,7 @@ def main():
     while (current_time - initial_time) < train_time:
       sess.run(train_step)
       count += 1
-      if count % 1000 == 0:
+      if count % 10000 == 0:
         current_time = time()
         print("Elapsed time: {}".format(current_time - initial_time))
     # Log error loop
@@ -139,10 +139,12 @@ def main():
     while (current_time - initial_time) < train_time:
       sess.run(train_step2)
       count += 1
-      if count % 1000 == 0:
+      if count % 10000 == 0:
         current_time = time()
         print("Elapsed time: {}".format(current_time - initial_time))
     predicted_prices = y[-1].eval()
+    print(_y)
+    print(predicted_prices)
   # Update the entries with predicted prices
   print(predicted_prices)
   #update_cur = conn.cursor()
