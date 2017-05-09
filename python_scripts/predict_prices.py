@@ -8,6 +8,7 @@ import psycopg2
 import urllib.parse
 import os
 from time import sleep
+from time import time
 import sys
 
 import tensorflow as tf
@@ -39,8 +40,11 @@ def format_data(data):
   LONGITUDE = 11
   LATITUDE = 12
   data = pd.DataFrame(data)
+  # Pruning data goes here
+  # End pruning
   norms = {}
   tf_data = {}
+  ids = data.iloc[:,ID].values
   data.iloc[:,DESCRIPTION] = (data.iloc[:,DESCRIPTION].apply(make_numerical(HOUSE_KEYS))).astype(int)
   tf_data['description'] = tf.one_hot(data.iloc[:,DESCRIPTION].values, len(HOUSE_KEYS), dtype=tf.float32)
   data.iloc[:,EXTRA_BED] = (data.iloc[:,EXTRA_BED]).astype(int)
@@ -73,7 +77,7 @@ def format_data(data):
   norms['price_std'] = data.iloc[:,PRICE].std()
   data.iloc[:,PRICE] = (data.iloc[:,PRICE] - norms['price_mean'])/norms['price_std']
   data_output = tf.reshape(tf.constant(data.iloc[:,PRICE].values, dtype=tf.float32),[-1,1])
-  return data_input, data_output, norms
+  return data_input, data_output, norms, ids
 
 def main():
   urllib.parse.uses_netloc.append("postgres")
@@ -91,7 +95,7 @@ def main():
   find_cur.close()
   conn.commit()
   # Machine learn on the variables, and write back to database
-  x, _y, rn = format_data(results)
+  x, _y, rn, ids = format_data(results)
   num_input = int(x.shape[1])
   layers = [num_input*2, num_input*1]
   W = []
@@ -115,17 +119,28 @@ def main():
   train_step = tf.train.GradientDescentOptimizer(0.002).minimize(cost)
   train_step2 = tf.train.GradientDescentOptimizer(0.002).minimize(cost2)
   init_op = tf.global_variables_initializer()
-  saver = tf.train.Saver(W+b)
+  train_time = 60
   with tf.Session() as sess:
     sess.run(init_op)
-    for _ in range(1000):
+    initial_time = time()
+    current_time = time()
+    count = 0
+    while (current_time - initial_time) < train_time:
       sess.run(train_step)
-    print('Cost1 = ',cost.eval())
-    for _ in range(1000):
+      count += 1
+      if count % 1000 == 0:
+        current_time = time()
+        initial_time = time()
+    current_time = time()
+    count = 0
+    while (current_time - initial_time) < train_time:
       sess.run(train_step2)
-    print('Cost2 = ',cost2.eval())
-    saver.save(sess, './model_params/dnn_relu6')
+      count += 1
+      if count % 1000 == 0:
+        current_time = time()
+    predicted_prices = y.eval()
   # Update the entries with predicted prices
+  print(predicted_prices)
   #update_cur = conn.cursor()
   #update_cur.close()
   #conn.commit()
