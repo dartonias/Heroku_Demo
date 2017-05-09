@@ -24,6 +24,12 @@ def make_numerical(names):
     return -1
   return f
 
+def close(x,y):
+  tol = 0.1
+  if (x-y) < tol and (x-y) < tol:
+    return True
+  return False
+
 def format_data(data):
   # Values held in the rows
   ID = 0
@@ -41,6 +47,7 @@ def format_data(data):
   LATITUDE = 12
   data = pd.DataFrame(data)
   # Pruning data goes here
+  #data = data.dropna(how='any', axis=0)
   # End pruning
   norms = {}
   tf_data = {}
@@ -64,6 +71,9 @@ def format_data(data):
   norms['longitude_std'] = data.iloc[:,LONGITUDE].std()
   norms['latitude_mean'] = data.iloc[:,LATITUDE].mean()
   norms['latitude_std'] = data.iloc[:,LATITUDE].std()
+  # Put houses where lookup failed in the average position
+  data.iloc[:,LONGITUDE] = (data.iloc[:,LONGITUDE].apply(lambda x: norms['longitude_mean'] if close(x,FILTER_LOC) else x))
+  data.iloc[:,LATITUDE] = (data.iloc[:,LATITUTE].apply(lambda x: norms['latitude_mean'] if close(x,FILTER_LOC) else x))
   data.iloc[:,LONGITUDE] = (data.iloc[:,LONGITUDE] - norms['longitude_mean'])/norms['longitude_std']
   data.iloc[:,LATITUDE] = (data.iloc[:,LATITUDE] - norms['latitude_mean'])/norms['latitude_std']
   tf_data['longitude'] = tf.reshape(tf.constant(data.iloc[:,LONGITUDE].values, dtype=tf.float32),[-1,1])
@@ -147,12 +157,16 @@ def main():
     #    current_time = time()
     #    print("Elapsed time: {}".format(current_time - initial_time))
     #    print("Cost2: {}".format(cost2.eval()))
-    print("Y is")
-    print(y[-1].eval())
-    print("_Y is")
-    print(_y.eval())
-    #predicted_prices = y[-1].eval()
+    #print("Y is")
+    #print(y[-1].eval())
+    #print("_Y is")
+    #print(_y.eval())
+    predicted_prices = y[-1].eval()
   # Update the entries with predicted prices
+  print("ids = ")
+  print(ids)
+  print("values = ")
+  print(predicted_prices)
   #update_cur = conn.cursor()
   #update_cur.close()
   #conn.commit()
