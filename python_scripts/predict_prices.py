@@ -73,7 +73,7 @@ def format_data(data):
   norms['latitude_std'] = data.iloc[:,LATITUDE].std()
   # Put houses where lookup failed in the average position
   data.iloc[:,LONGITUDE] = (data.iloc[:,LONGITUDE].apply(lambda x: norms['longitude_mean'] if close(x,FILTER_LOC) else x))
-  data.iloc[:,LATITUDE] = (data.iloc[:,LATITUTE].apply(lambda x: norms['latitude_mean'] if close(x,FILTER_LOC) else x))
+  data.iloc[:,LATITUDE] = (data.iloc[:,LATITUDE].apply(lambda x: norms['latitude_mean'] if close(x,FILTER_LOC) else x))
   data.iloc[:,LONGITUDE] = (data.iloc[:,LONGITUDE] - norms['longitude_mean'])/norms['longitude_std']
   data.iloc[:,LATITUDE] = (data.iloc[:,LATITUDE] - norms['latitude_mean'])/norms['latitude_std']
   tf_data['longitude'] = tf.reshape(tf.constant(data.iloc[:,LONGITUDE].values, dtype=tf.float32),[-1,1])
