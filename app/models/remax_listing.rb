@@ -9,7 +9,7 @@ class RemaxListing < ActiveRecord::Base
   end
 
   def self.has_prediction
-    where.not('price_prediction' => nil)
+    where.not(predicted_price: => nil)
   end
   
   def self.add_new_listings
