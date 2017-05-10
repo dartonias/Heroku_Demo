@@ -163,19 +163,16 @@ def main():
   with tf.Session() as sess:
     sess.run(init_op)
     # Restore the previous data parameters if they exists on the Amazon S3 bucket
-    #try:
-    #  download_data()
-    #  print('Download succeeded')
-    #  saver.restore(sess, './model_params/dnn_relu6')
-    #except botocore.exceptions.ClientError as e:
-    #  print(e)
+    try:
+      download_data()
+      print('Download succeeded')
+      saver.restore(sess, './model_params/dnn_relu6')
+    except botocore.exceptions.ClientError as e:
+      print(e)
     # Normal error loop
     initial_time = time()
     current_time = time()
     count = 0
-    print("Cost: {}".format(cost.eval()))
-    print(x.eval())
-    print(_y.eval())
     while (current_time - initial_time) < train_time:
       sess.run(train_step)
       count += 1
@@ -183,9 +180,6 @@ def main():
         current_time = time()
         print("Elapsed time: {}".format(current_time - initial_time))
         print("Cost: {}".format(cost.eval()))
-    for w in W:
-      print(w.eval())
-    print(y[-1].eval())
     # Log error loop
     #initial_time = time()
     #current_time = time()
@@ -197,15 +191,17 @@ def main():
     #    current_time = time()
     #    print("Elapsed time: {}".format(current_time - initial_time))
     #    print("Cost2: {}".format(cost2.eval()))
-    #saver.save(sess, './model_params/dnn_relu6')
+    saver.save(sess, './model_params/dnn_relu6')
     predicted_prices = tf.reshape(y[-1]*rn['price_std']+rn['price_mean'],[-1]).eval().tolist()
   # Update the entries with predicted prices
-  #save_data()
-  #update_cur = conn.cursor()
-  #for id,pprice in zip(ids, predicted_prices):
-  #  update_cur.execute("UPDATE public.remax_listings SET predicted_price=(%s) WHERE id=(%s);",(pprice, id))
-  #update_cur.close()
-  #conn.commit()
+  save_data()
+  update_cur = conn.cursor()
+  # Reset old predictions
+  update_cur.execute("UPDATE public.remax_listings SET predicted_price=NULL;")
+  for id,pprice in zip(ids, predicted_prices):
+    update_cur.execute("UPDATE public.remax_listings SET predicted_price=(%s) WHERE id=(%s);",(pprice, id))
+  update_cur.close()
+  conn.commit()
   conn.close() 
 
 if __name__ == "__main__":

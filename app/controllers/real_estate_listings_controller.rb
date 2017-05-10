@@ -8,6 +8,6 @@ class RealEstateListingsController < ApplicationController
       params[:limit] = 20
     end
 
-    @listings = RemaxListing.residential.search(params[:search]).regexp(params[:regexp]).gt(params[:minprice]).lt(params[:maxprice]).limit(params[:limit])
+    @listings = RemaxListing.has_prediction.residential.search(params[:search]).regexp(params[:regexp]).gt(params[:minprice]).lt(params[:maxprice]).limit(params[:limit])
   end
 end

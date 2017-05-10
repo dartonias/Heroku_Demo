@@ -7,6 +7,10 @@ class RemaxListing < ActiveRecord::Base
     # Hand pruned list of residential offerings
     where(description: RESIDENTIAL_TYPES)
   end
+
+  def self.has_prediction
+    where.not('price_prediction' => nil)
+  end
   
   def self.add_new_listings
     listings = RemaxQuery.results
