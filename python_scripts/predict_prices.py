@@ -161,7 +161,6 @@ def main():
   except KeyError:
     train_time = 600
   with tf.Session() as sess:
-    print(W[0].eval())
     sess.run(init_op)
     print(W[0].eval())
     # Restore the previous data parameters if they exists on the Amazon S3 bucket
