@@ -150,9 +150,9 @@ def main():
   # Normal squared error loss
   cost = tf.reduce_mean(tf.squared_difference(y[-1], _y))
   # Squared error of the percentage incorrect
-  cost2 = tf.reduce_mean(tf.squared_difference(tf.log(y[-1]*rn['price_std']+rn['price_mean']), tf.log(_y*rn['price_std']+rn['price_mean'])))
+  #cost2 = tf.reduce_mean(tf.squared_difference(tf.log(y[-1]*rn['price_std']+rn['price_mean']), tf.log(_y*rn['price_std']+rn['price_mean'])))
   train_step = tf.train.GradientDescentOptimizer(0.002).minimize(cost)
-  train_step2 = tf.train.GradientDescentOptimizer(0.002).minimize(cost2)
+  #train_step2 = tf.train.GradientDescentOptimizer(0.002).minimize(cost2)
   init_op = tf.global_variables_initializer()
   saver = tf.train.Saver(W+b)
   # Training time in seconds, training will run for at least this long
@@ -162,7 +162,6 @@ def main():
     train_time = 600
   with tf.Session() as sess:
     sess.run(init_op)
-    print(W[-1].eval())
     # Restore the previous data parameters if they exists on the Amazon S3 bucket
     #try:
     #  download_data()
@@ -184,6 +183,9 @@ def main():
         current_time = time()
         print("Elapsed time: {}".format(current_time - initial_time))
         print("Cost: {}".format(cost.eval()))
+    for w in W:
+      print(w.eval())
+    print(y[-1].eval())
     # Log error loop
     #initial_time = time()
     #current_time = time()
@@ -195,15 +197,15 @@ def main():
     #    current_time = time()
     #    print("Elapsed time: {}".format(current_time - initial_time))
     #    print("Cost2: {}".format(cost2.eval()))
-    saver.save(sess, './model_params/dnn_relu6')
+    #saver.save(sess, './model_params/dnn_relu6')
     predicted_prices = tf.reshape(y[-1]*rn['price_std']+rn['price_mean'],[-1]).eval().tolist()
   # Update the entries with predicted prices
-  save_data()
-  update_cur = conn.cursor()
-  for id,pprice in zip(ids, predicted_prices):
-    update_cur.execute("UPDATE public.remax_listings SET predicted_price=(%s) WHERE id=(%s);",(pprice, id))
-  update_cur.close()
-  conn.commit()
+  #save_data()
+  #update_cur = conn.cursor()
+  #for id,pprice in zip(ids, predicted_prices):
+  #  update_cur.execute("UPDATE public.remax_listings SET predicted_price=(%s) WHERE id=(%s);",(pprice, id))
+  #update_cur.close()
+  #conn.commit()
   conn.close() 
 
 if __name__ == "__main__":
