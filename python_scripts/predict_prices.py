@@ -156,14 +156,15 @@ def main():
   init_op = tf.global_variables_initializer()
   saver = tf.train.Saver(W+b)
   # Training time in seconds, training will run for at least this long
-  train_time = 60
+  train_time = 600
   with tf.Session() as sess:
     sess.run(init_op)
+    # Restore the previous data parameters if they exists on the Amazon S3 bucket
     try:
       download_data()
       saver.restore(sess, './model_params/dnn_relu6')
-    except botocore.exceptions.ClientError:
-      print('File not available, starting from scratch')
+    except botocore.exceptions.ClientError as e:
+      print(e)
     # Normal error loop
     initial_time = time()
     current_time = time()
@@ -193,14 +194,16 @@ def main():
     saver.save(sess, './model_params/dnn_relu6')
     predicted_prices = tf.reshape(y[-1]*rn['price_std']+rn['price_mean'],[-1]).eval().tolist()
   # Update the entries with predicted prices
-  print("ids = ")
-  print(ids)
-  print("values = ")
-  print(predicted_prices)
+  #print("ids = ")
+  #print(ids)
+  #print("values = ")
+  #print(predicted_prices)
   save_data()
-  #update_cur = conn.cursor()
-  #update_cur.close()
-  #conn.commit()
+  update_cur = conn.cursor()
+  for id,pprice in zip(ids, predicted_prices):
+    update_cur.execute("UPDATE public.remax_listings SET predicted_price=(%s) WHERE id=(%s);",(pprice, id))
+  update_cur.close()
+  conn.commit()
   conn.close() 
 
 if __name__ == "__main__":
