@@ -157,7 +157,7 @@ def main():
   saver = tf.train.Saver(W+b)
   # Training time in seconds, training will run for at least this long
   try:
-    train_time = os.environ["REMAX_TRAIN_TIME"]
+    train_time = int(os.environ["REMAX_TRAIN_TIME"])
   except KeyError:
     train_time = 600
   with tf.Session() as sess:
