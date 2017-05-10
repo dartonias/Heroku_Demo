@@ -50,7 +50,7 @@ def format_data(data):
   LATITUDE = 12
   data = pd.DataFrame(data)
   # Pruning data goes here
-  #data = data.dropna(how='any', axis=0)
+  data = data.dropna(how='any', axis=0)
   # End pruning
   norms = {}
   tf_data = {}
