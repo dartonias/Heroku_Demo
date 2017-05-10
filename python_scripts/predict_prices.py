@@ -100,7 +100,7 @@ def save_data():
   files = glob.glob('./model_params/dnn_relu6*')
   for f in files:
     name = os.path.basename(f)
-    s3.upload_file(name,'dartonias-remax-model',name)
+    s3.upload_file(f,'dartonias-remax-model',name)
 
 def main():
   urllib.parse.uses_netloc.append("postgres")
