@@ -156,7 +156,10 @@ def main():
   init_op = tf.global_variables_initializer()
   saver = tf.train.Saver(W+b)
   # Training time in seconds, training will run for at least this long
-  train_time = 600
+  try:
+    train_time = os.environ["REMAX_TRAIN_TIME"]
+  except KeyError:
+    train_time = 600
   with tf.Session() as sess:
     sess.run(init_op)
     # Restore the previous data parameters if they exists on the Amazon S3 bucket
@@ -187,17 +190,9 @@ def main():
     #    current_time = time()
     #    print("Elapsed time: {}".format(current_time - initial_time))
     #    print("Cost2: {}".format(cost2.eval()))
-    #print("Y is")
-    #print(y[-1].eval())
-    #print("_Y is")
-    #print(_y.eval())
     saver.save(sess, './model_params/dnn_relu6')
     predicted_prices = tf.reshape(y[-1]*rn['price_std']+rn['price_mean'],[-1]).eval().tolist()
   # Update the entries with predicted prices
-  #print("ids = ")
-  #print(ids)
-  #print("values = ")
-  #print(predicted_prices)
   save_data()
   update_cur = conn.cursor()
   for id,pprice in zip(ids, predicted_prices):
