@@ -2,4 +2,5 @@
 <td><%= link_to listing.name + ' ' + listing.address, "https://www.remax.ca#{listing.url}" %></td>
 <td><%= listing.square %></td>
 <td><%= number_to_currency listing.price, precision: 0 %></td>
+<td><%= number_to_currency listing.predicted_price, precision: 0 %></td>
 </tr>

@@ -5,9 +5,25 @@
 <h1>Real Estate Listings</h1>
 
 <p>
-lorem ipsum lorem ipsum
+We collect real estate listings from ReMax and add them to our database, filtering for residential properties.
+Using this data, we use tensorflow to do prediction on the price of houses.
+The optimization is done on Heroku while the model parameters are stored on Amazon S3, with the parameters further optimized once a day.
+Deleting the old parameters from the S3 bucket will cause the simulation to start with new random weights.
+</p>
+<p>
+The idea behind the price approximation is to see which houses might be over or under valued, or at least for which our limited information is unable to explain the price of a house.
 </p>
   
+<p>Valid modifiers as a query in the URL are the following:
+<table class="args">
+<tr><td><code>search</code></td><td>(str) limits results that contain the substring in the address</td></tr>
+<tr><td><code>regexp</code></td><td>(str) limits results that contain the regular expression in the address, will override search command</td></tr>
+<tr><td><code>minprice</code></td><td>(int) minimum value of actual price to be displayed</td></tr>
+<tr><td><code>maxprice</code></td><td>(int) maximum value of actual price to be displayed</td></tr>
+<tr><td><code>limit</code></td><td>(int) limits the number of entries returned</td></tr>
+</table>
+</p>
+
 <%= form_tag realestate_path, :method => 'get' do %>
     <%= text_field_tag :search, params[:search] %>
     <%= label :search, 'Address Search' %>
@@ -24,6 +40,8 @@ lorem ipsum lorem ipsum
     <%= submit_tag "Filter", :name => nil %>
     <%= button_tag "Reset", type: :reset %>
 <% end %>
+
+<p><%= link_to "JSON results", realestate_path(format: :json, search: params[:search], regexp: params[:regexp], minprice: params[:minprice], maxprice: params[:maxprice], limit: params[:limit]) %></p>
   
 <h2>Recent Listings</h2>
 <table class="table table-striped">
@@ -31,6 +49,7 @@ lorem ipsum lorem ipsum
 <th>Address</th>
 <th>Square ft</th>
 <th>Price</th>
+<th>Predicted Price</th>
 </tr>
 <%= render partial: "listing", collection: @listings %>
 </table>

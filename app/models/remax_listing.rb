@@ -36,4 +36,28 @@ class RemaxListing < ActiveRecord::Base
       all
     end
   end
+
+  def self.regexp(query)
+    if query and query.size > 0
+      where("name ~* ? OR address ~* ? OR description ~* ?", query, query, query)
+    else
+      all
+    end
+  end
+
+  def self.gt(val)
+    if val and val.to_i > 0
+      where("price > ?", val.to_i)
+    else
+      all
+    end
+  end
+
+  def self.lt(val)
+    if val and val.to_i > 0
+      where("price < ?", val.to_i)
+    else
+      all
+    end
+  end
 end

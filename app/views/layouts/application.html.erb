@@ -20,17 +20,15 @@
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="glyphicon glyphicon-info-sign"></span> Demos <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
-            <li class="<%= 'active' if current_page?(reddit_path) %>">
-              <%= link_to "Reddit Censorship", reddit_path %>
+            <li class="<%= 'active' if current_page?(realestate_path) %>">
+              <%= link_to "Real Estate", realestate_path %>
             </li>
             <li class="<%= 'active' if current_page?(sudoku_path) %>">
               <%= link_to "Sudoku Solver", sudoku_path %>
             </li>
-            <!--
-            <li class="<%= 'active' if current_page?(realestate_path) %>">
-              <%= link_to "Real Estate", realestate_path %>
+            <li class="<%= 'active' if current_page?(reddit_path) %>">
+              <%= link_to "Reddit Censorship", reddit_path %>
             </li>
-            -->
           </ul>
       </li>
     </ul>
