@@ -162,7 +162,7 @@ def main():
     train_time = 600
   with tf.Session() as sess:
     sess.run(init_op)
-    print(W[0].eval())
+    print(W[-1].eval())
     # Restore the previous data parameters if they exists on the Amazon S3 bucket
     try:
       download_data()
@@ -170,18 +170,18 @@ def main():
       saver.restore(sess, './model_params/dnn_relu6')
     except botocore.exceptions.ClientError as e:
       print(e)
-    print(W[0].eval())
+    print(W[-1].eval())
     # Normal error loop
     initial_time = time()
     current_time = time()
     count = 0
-    while (current_time - initial_time) < train_time:
-      sess.run(train_step)
-      count += 1
-      if count % 10000 == 0:
-        current_time = time()
-        print("Elapsed time: {}".format(current_time - initial_time))
-        print("Cost: {}".format(cost.eval()))
+    #while (current_time - initial_time) < train_time:
+    #  sess.run(train_step)
+    #  count += 1
+    #  if count % 10000 == 0:
+    #    current_time = time()
+    #    print("Elapsed time: {}".format(current_time - initial_time))
+    #    print("Cost: {}".format(cost.eval()))
     # Log error loop
     #initial_time = time()
     #current_time = time()
