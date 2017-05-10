@@ -14,6 +14,7 @@ import sys
 import tensorflow as tf
 import pandas as pd
 import boto3
+import botocore
 import glob
 
 HOUSE_KEYS = ["House", "Detached", "Att/Row/Twnhouse", "Duplex", "Apartment", "Single Family", "Townhouses", "Multi-Family", "Triplex", "Condominiums", "Condo Townhouse", "Condo Apt"]
@@ -102,6 +103,17 @@ def save_data():
     name = os.path.basename(f)
     s3.upload_file(f,'dartonias-remax-model',name)
 
+def download_data():
+  s3 = boto3.client(
+    's3',
+    aws_access_key_id=os.environ["REMAX_AWS_ID"],
+    aws_secret_access_key=os.environ["REMAX_AWS_KEY"],
+    region_name=os.environ["REMAX_AWS_REGION"]
+  )
+  files = ['dnn_relu6.data-00000-of-00001', 'dnn_relu6.index', 'dnn_relu6.meta']
+  for f in files:
+    s3.download_file(Bucket='dartonias-remax-model', Key=f, Filename='./model_params/'+f)
+
 def main():
   urllib.parse.uses_netloc.append("postgres")
   url = urllib.parse.urlparse(os.environ["DATABASE_URL"])
@@ -147,6 +159,11 @@ def main():
   train_time = 60
   with tf.Session() as sess:
     sess.run(init_op)
+    try:
+      download_data()
+      saver.restore(sess, './model_params/dnn_relu6')
+    except botocore.exceptions.ClientError:
+      print('File not available, starting from scratch')
     # Normal error loop
     initial_time = time()
     current_time = time()
