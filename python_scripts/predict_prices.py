@@ -14,6 +14,7 @@ import sys
 import tensorflow as tf
 import pandas as pd
 import boto3
+import glob
 
 HOUSE_KEYS = ["House", "Detached", "Att/Row/Twnhouse", "Duplex", "Apartment", "Single Family", "Townhouses", "Multi-Family", "Triplex", "Condominiums", "Condo Townhouse", "Condo Apt"]
 FILTER_LOC = 999
