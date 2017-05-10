@@ -113,7 +113,6 @@ def download_data():
   files = ['dnn_relu6.data-00000-of-00001', 'dnn_relu6.index', 'dnn_relu6.meta']
   for f in files:
     s3.download_file(Bucket='dartonias-remax-model', Key=f, Filename='./model_params/'+f)
-  return True
 
 def main():
   urllib.parse.uses_netloc.append("postgres")
@@ -162,7 +161,9 @@ def main():
   except KeyError:
     train_time = 600
   with tf.Session() as sess:
+    print(W[0].eval())
     sess.run(init_op)
+    print(W[0].eval())
     # Restore the previous data parameters if they exists on the Amazon S3 bucket
     try:
       download_data()
@@ -170,6 +171,7 @@ def main():
       saver.restore(sess, './model_params/dnn_relu6')
     except botocore.exceptions.ClientError as e:
       print(e)
+    print(W[0].eval())
     # Normal error loop
     initial_time = time()
     current_time = time()
