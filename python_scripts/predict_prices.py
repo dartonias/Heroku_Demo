@@ -13,6 +13,7 @@ import sys
 
 import tensorflow as tf
 import pandas as pd
+import boto3
 
 HOUSE_KEYS = ["House", "Detached", "Att/Row/Twnhouse", "Duplex", "Apartment", "Single Family", "Townhouses", "Multi-Family", "Triplex", "Condominiums", "Condo Townhouse", "Condo Apt"]
 FILTER_LOC = 999
@@ -88,6 +89,18 @@ def format_data(data):
   data_output = tf.reshape(tf.constant(data.iloc[:,PRICE].values, dtype=tf.float32),[-1,1])
   return data_input, data_output, norms, ids
 
+def save_data():
+  s3 = boto3.client(
+    's3',
+    aws_access_key_id=os.environ["REMAX_AWS_ID"],
+    aws_secret_access_key=os.environ["REMAX_AWS_KEY"],
+    region_name=os.environ["REMAX_AWS_REGION"]
+  )
+  files = glob.glob('./model_params/dnn_relu6*')
+  for f in files:
+    name = os.path.basename(f)
+    s3.upload_file(name,'dartonias-remax-model',name)
+
 def main():
   urllib.parse.uses_netloc.append("postgres")
   url = urllib.parse.urlparse(os.environ["DATABASE_URL"])
@@ -128,8 +141,9 @@ def main():
   train_step = tf.train.GradientDescentOptimizer(0.002).minimize(cost)
   train_step2 = tf.train.GradientDescentOptimizer(0.002).minimize(cost2)
   init_op = tf.global_variables_initializer()
+  saver = tf.train.Saver(W+b)
   # Training time in seconds, training will run for at least this long
-  train_time = 600
+  train_time = 60
   with tf.Session() as sess:
     sess.run(init_op)
     # Normal error loop
@@ -158,12 +172,14 @@ def main():
     #print(y[-1].eval())
     #print("_Y is")
     #print(_y.eval())
+    saver.save(sess, './model_params/dnn_relu6')
     predicted_prices = tf.reshape(y[-1]*rn['price_std']+rn['price_mean'],[-1]).eval().tolist()
   # Update the entries with predicted prices
   print("ids = ")
   print(ids)
   print("values = ")
   print(predicted_prices)
+  save_data()
   #update_cur = conn.cursor()
   #update_cur.close()
   #conn.commit()
