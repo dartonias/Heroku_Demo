@@ -50,6 +50,8 @@ def format_data(data):
   LATITUDE = 12
   data = pd.DataFrame(data)
   # Pruning data goes here
+  data.iloc[:,SQUARE] = data.iloc[:,SQUARE].apply(lambda x: x if x > 500 else None)
+  data.iloc[:,PRICE] = data.iloc[:,PRICE].apply(lambda x: x if (x > 100000 and x < 2000000) else None)
   data = data.dropna(how='any', axis=0)
   # End pruning
   norms = {}

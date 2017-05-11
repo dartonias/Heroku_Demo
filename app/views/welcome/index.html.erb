@@ -16,14 +16,20 @@ It is forked off the standard Heroku template for a Ruby on Rails project, but t
 </p>
 
 <p>
-The <%= link_to "reddit censorship", reddit_path %> project examines a subreddit, examining all its new posts and seeing which ones are removed from the subreddit after one day.
-The data is available to view as HTML or as JSON, and the most recent 1000 censored and uncensored posts (after 1 day) are kept on the application.
+The <%= link_to "Real estate", realestate_path %> project scrapes "for sale" housing listings, adds some metadata such as geographic location, and then does machine learning on the residential listings to attempt price prediction.
+Since listing price is less of a ground truth and more or a business offer, we can see how, based on our limited data, houses may be listed above or below the norm for prices using our simple regression model.
+The machine learning is done using tensorflow and making use of AWS services.
 </p>
 
 <p>
 The <%= link_to "Sudoku solver", sudoku_path %> project is a simple use of Markov chain Monte Carlo (MCMC) to solve Sudoku puzzles provided by the user.
 The problems are written to a database and solved asynchronously, and later refreshes of the page will display solutions (or failure of the simulation).
 The simulation could be run on the client-side using JavaScript, displaying current progress as the simulation runs, but I decided on running them server-side to support solving even for devices that had very little computational power.
+</p>
+
+<p>
+The <%= link_to "reddit censorship", reddit_path %> project examines a subreddit, examining all its new posts and seeing which ones are removed from the subreddit after one day.
+The data is available to view as HTML or as JSON, and the most recent 1000 censored and uncensored posts (after 1 day) are kept on the application.
 </p>
 
 </div>
